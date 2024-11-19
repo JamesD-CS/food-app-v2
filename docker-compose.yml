@@ -1,0 +1,51 @@
+services:
+  db:
+    image: postgres:latest
+    restart: always
+    container_name: food-app-postgres-db
+    ports:
+    - '5432:5432'
+    environment:
+    - POSTGRES_USER=postgres
+    - POSTGRES_PASSWORD=postgres
+    - POSTGRES_DB=postgres
+    volumes:
+    - db:/var/lib/postgresql/data
+    - ./sql/init_db.sql:/docker-entrypoint-initdb.d/init_db.sql
+
+  food-app-v2-react:
+    #add restart:always to keep trying connection to postgres db
+    restart: always
+    container_name: food-app-react
+    build:
+      context: ./food-app-v2-react
+      dockerfile: Dockerfile
+    volumes:
+      - ./food-app-v2-react:/app
+      - /app/node_modules
+    ports:
+      - '6970:6970'    
+       
+  food-app-v2-express:
+    build:
+      context: ./food-app-v2-express
+      dockerfile: Dockerfile
+    volumes:
+      - ./food-app-v2-express:/express-docker
+      - /express-docker/node_modules
+    container_name: food-app-express
+    ports:
+      - '6900:6900'
+    depends_on:
+      - db
+    links: 
+      - db
+        
+volumes:
+  db:
+    driver: local
+  
+
+
+
+  

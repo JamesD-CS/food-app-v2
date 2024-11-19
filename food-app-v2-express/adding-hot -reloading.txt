@@ -1,0 +1,12 @@
+1. edit docker-compose.yaml. add following lines to express backend build.
+
+ express-app:
+	build:
+    context: ./<relative-path-to-app-folder> if  docker compose.yaml is not in same directory otherwise .
+      dockerfile: Dockerfile
+    volumes:
+      - ./<relative path to app folder, same as context>:/<name of workdir in dockerfile>
+
+2. if nodemon not installed in express project folder run: npm install --save-dev nodemon
+
+3. edit scripts portion of package.json add  "dev": "nodemon src/index.ts"

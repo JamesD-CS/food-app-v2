@@ -1,0 +1,1 @@
+docker run -d -p 6970:6970 food-app-v2
