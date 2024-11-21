@@ -70,6 +70,10 @@ router.get('/login', async (req, res) => {
   let pass = req.body.password;
   let email = req.body.email;
 
+  if(!pass || !email){
+    res.status(422).json({"error":"missing email or password"});
+    return
+  }
 
   const query = {
     text: 'SELECT * FROM users WHERE email = $1',
@@ -80,9 +84,15 @@ router.get('/login', async (req, res) => {
     const result = await pool.query(query);
     let profile = result.rows;
     console.log(profile);
+    if(profile.length ===0 ){
+      console.log('not found')
+      res.status(401).json({"error": "user not found"});
+      return
+    }
     const match = await bcrypt.compare(pass, profile[0].password_hash);
     console.log(match);
-    let token = generate_jwt(profile[0].email, profile[0].name);
+    if (match){
+      let token = generate_jwt(profile[0].email, profile[0].name);
 
     res.json({
       "token":token, 
@@ -94,6 +104,11 @@ router.get('/login', async (req, res) => {
         "created_at": profile[0].created_at
       }
     });
+    }else{
+      res.status(401).json({"error":"invalid password"});
+      return
+    }
+    
 
   } catch (error) {
     console.error("Error reading from db", error);
