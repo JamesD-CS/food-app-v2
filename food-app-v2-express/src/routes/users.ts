@@ -1,7 +1,6 @@
 import express from 'express';
 import { userRegistrationSchema, userProfileUpdateSchema } from '../validator';
 import * as middlewares from '../middlewares';
-import api from '../api';
 import pool from '../../db';
 import { z } from 'zod';
 import * as bcrypt from 'bcryptjs';
@@ -14,11 +13,12 @@ const salt_rounds:number = 10;
 
 router.use(express.json());
 
-function generate_jwt(user_email:string, user_name:string){
+
+function generate_jwt(user_email:string, user_name:string, user_id:number){
   let secret_token:string = process.env.TOKEN_SECRET!;
 
   if (secret_token){
-    return jwt.sign({user_email, user_name, expiresIn: '2 days'}, secret_token);
+    return jwt.sign({user_email, user_name, user_id, expiresIn: '2 days'}, secret_token);
   }else{
     console.log('Error. secret_token not found in environemental variable');
   }
@@ -26,7 +26,10 @@ function generate_jwt(user_email:string, user_name:string){
 };
 
 /* Get user profile - auth required*/
-router.get('/profile', async (req, res) => {
+router.get('/profile/', async (req, res) => {
+
+  router.use(middlewares.authHandler);
+
   //user id in req.body
   let userid = req.body.userid;
 
@@ -92,7 +95,7 @@ router.get('/login', async (req, res) => {
     const match = await bcrypt.compare(pass, profile[0].password_hash);
     console.log(match);
     if (match){
-      let token = generate_jwt(profile[0].email, profile[0].name);
+      let token = generate_jwt(profile[0].email, profile[0].name, profile[0].id);
 
     res.json({
       "token":token, 
@@ -155,14 +158,64 @@ router.post('/', async(req, res) =>{
 router.put('/profile', async(req, res) =>{
 
   try{
+    const validatedUserData = userProfileUpdateSchema.parse(req.body);
+    let updatedName = ((validatedUserData.name) ? validatedUserData.name:null);
+    let updatedPhone = ((validatedUserData.phone_number) ? validatedUserData.phone_number:null);
+    let updatedPass = ((validatedUserData.password) ? validatedUserData.password:null);
+
+    console.log('updated name:', updatedName, 'updated phone:', updatedPhone, 'updated pass:', updatedPass);
+
+    let update_string = 'UPDATE users SET ';
+    let update_values = []
+    let var_num = 0;
+
+    if (updatedName){
+      var_num += 1;
+      update_string += 'name = $' + var_num.toString() + ' ';
+      update_values.push(updatedName);
+    }
+
+    if (updatedPhone) {
+      var_num += 1;
+      update_string += 'phone_number = $' + var_num.toString() + ' ';
+      update_values.push(updatedPhone);
+    }
+
+    if (updatedPass) {
+      var_num += 1;
+      update_string += 'password = $' + var_num.toString() + ' ';
+      //hash password before insert
+      let hashed_pass:string = await(bcrypt.hash(updatedPass, salt_rounds));
+      update_values.push(hashed_pass);
+    }
+
+    console.log(update_string, update_values);
+
+    let update_user_query ={
+      text: update_string,
+      values: update_values
+    }
+
+    console.log('final query:', update_user_query);
+
+    res.status(204).json({message:'updated'});
 
   }catch(error){
-
+    if (error instanceof z.ZodError) {
+      // Handle validation errors
+      console.log("invalid data", error.errors);
+      res.status(400).json({ errors: error.errors });
+    } else {
+      // Handle other errors
+      res.status(500).json({ message: 'Internal Server Error' });
+    }
   }
+
+
+
 
 });
 
-router.use('/api/v1', api);
 
 router.use(middlewares.notFound);
 router.use(middlewares.errorHandler);

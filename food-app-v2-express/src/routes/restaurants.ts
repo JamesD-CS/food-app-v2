@@ -1,7 +1,6 @@
 import express from 'express';
 import { restaurantCreationSchema } from '../validator';
 import * as middlewares from '../middlewares';
-import api from '../api';
 import pool from '../../db';
 import { z } from 'zod';
 require('dotenv').config();
@@ -10,15 +9,6 @@ const app = express();
 const router = express.Router();
 
 router.use(express.json());
-
-/* Get list of all restaurants */
-router.get('/new', async (req, res) => {
-  
-    res.json({
-      "message":"hi"
-    });
-  
-});
 
 /* Get list of all restaurants */
 router.get('/', async (req, res) => {
@@ -90,8 +80,6 @@ router.post('/', async(req, res) =>{
   }
 
 });
-
-router.use('/api/v1', api);
 
 router.use(middlewares.notFound);
 router.use(middlewares.errorHandler);

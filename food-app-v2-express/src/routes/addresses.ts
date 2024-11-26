@@ -1,7 +1,6 @@
 import express from 'express';
 import { addressSchema } from '../validator';
 import * as middlewares from '../middlewares';
-import api from '../api';
 import pool from '../../db';
 import { z } from 'zod';
 require('dotenv').config();
@@ -82,7 +81,6 @@ router.post('/', async(req, res) =>{
 
 });
 
-router.use('/api/v1', api);
 
 router.use(middlewares.notFound);
 router.use(middlewares.errorHandler);

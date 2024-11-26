@@ -11,6 +11,7 @@ import pool from '../db';
 import restaurantRouter from './routes/restaurants';
 import addressRouter from './routes/addresses';
 import usersRouter from './routes/users';
+import ordersRouter from './routes/orders';
 
 
 require('dotenv').config();
@@ -23,9 +24,11 @@ app.use(cors());
 app.use(express.json());
 
 /*Define routes for app to use */
+
 app.use('/restaurants', restaurantRouter);
 app.use('/addresses', addressRouter);
 app.use('/users', usersRouter);
+app.use('/orders', ordersRouter);
 
 
 
