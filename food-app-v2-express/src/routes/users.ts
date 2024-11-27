@@ -26,16 +26,18 @@ function generate_jwt(user_email:string, user_name:string, user_id:number){
 };
 
 /* Get user profile - auth required*/
-router.get('/profile/', async (req, res) => {
+router.get('/profile',middlewares.authHandler, async (req, res) => {
 
-  router.use(middlewares.authHandler);
+  let userdata = res.locals.userdata;
+  let user_id = userdata.user_id;
+  console.log('userdata:', userdata);
+  console.log('user id:', userdata.user_id);
 
   //user id in req.body
-  let userid = req.body.userid;
 
   const query = {
     text: 'SELECT * FROM users WHERE id = $1',
-    values: [userid]
+    values: [user_id]
   }
 
   try {
@@ -155,7 +157,12 @@ router.post('/', async(req, res) =>{
 });
 
 /*Update user profile */
-router.put('/profile', async(req, res) =>{
+router.put('/profile', middlewares.authHandler, async(req, res) =>{
+
+  let userdata = res.locals.userdata;
+  let user_id = userdata.user_id;
+  console.log('userdata:', userdata);
+  console.log('user id:', userdata.user_id);
 
   try{
     const validatedUserData = userProfileUpdateSchema.parse(req.body);
@@ -188,6 +195,9 @@ router.put('/profile', async(req, res) =>{
       let hashed_pass:string = await(bcrypt.hash(updatedPass, salt_rounds));
       update_values.push(hashed_pass);
     }
+    var_num += 1
+    update_string += 'WHERE id = $' + var_num.toString();
+    update_values.push(user_id);
 
     console.log(update_string, update_values);
 
@@ -197,6 +207,8 @@ router.put('/profile', async(req, res) =>{
     }
 
     console.log('final query:', update_user_query);
+    const result = await pool.query(update_user_query);
+    console.log(result);
 
     res.status(204).json({message:'updated'});
 
