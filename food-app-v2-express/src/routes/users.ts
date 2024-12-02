@@ -158,7 +158,7 @@ router.post('/', async(req, res) =>{
 
 /*Update user profile */
 router.put('/profile', middlewares.authHandler, async(req, res) =>{
-
+  //get user data from middleware authhandler
   let userdata = res.locals.userdata;
   let user_id = userdata.user_id;
   console.log('userdata:', userdata);
@@ -202,15 +202,16 @@ router.put('/profile', middlewares.authHandler, async(req, res) =>{
     console.log(update_string, update_values);
 
     let update_user_query ={
-      text: update_string,
+      text: update_string + ' Returning *',
       values: update_values
     }
 
     console.log('final query:', update_user_query);
     const result = await pool.query(update_user_query);
-    console.log(result);
+    console.log('returned results: ',result.rows[0].name, result.rows[0].phone_number);
+    let updated_user = {"id": result.rows[0].id, "name":result.rows[0].name, "phone_number": result.rows[0].phone_number,"updated_at": result.rows[0].updated_at};
 
-    res.status(204).json({message:'updated'});
+    res.status(200).json(updated_user);
 
   }catch(error){
     if (error instanceof z.ZodError) {
