@@ -3,7 +3,8 @@ import { userRegistrationSchema, userProfileUpdateSchema } from '../validator';
 import * as middlewares from '../middlewares';
 import pool from '../../db';
 import { z } from 'zod';
-import * as bcrypt from 'bcryptjs';
+//import * as bcrypt from 'bcryptjs';
+import * as argon2 from 'argon2';
 import * as jwt from 'jsonwebtoken';
 require('dotenv').config();
 
@@ -94,7 +95,7 @@ router.get('/login', async (req, res) => {
       res.status(401).json({"error": "user not found"});
       return
     }
-    const match = await bcrypt.compare(pass, profile[0].password_hash);
+    const match = await argon2.verify( profile[0].password_hash ,pass );
     console.log(match);
     if (match){
       let token = generate_jwt(profile[0].email, profile[0].name, profile[0].id);
@@ -132,17 +133,19 @@ router.post('/', async(req, res) =>{
     console.log("data is valid:", validatedData);
 
     //hash password before insert
-    let hashed_pass:string = await(bcrypt.hash(validatedData.password, salt_rounds));
+    let hashed_pass:string = await(argon2.hash(validatedData.password));
     console.log(hashed_pass);
     //insert user data into db if valid
     let user_insert_query = {
-      text: 'INSERT INTO users (name, email, phone_number, password_hash) VALUES($1, $2, $3, $4 )',
+      text: 'INSERT INTO users (name, email, phone_number, password_hash) VALUES($1, $2, $3, $4) RETURNING *',
       values: [validatedData.name, validatedData.email, validatedData.phone_number, hashed_pass]
     };
 
     const result = await pool.query(user_insert_query);
     console.log(result);
-    res.status(201).json({"response": "user registered"});
+    let new_user = {"id":result.rows[0].id, "name": result.rows[0].name, "email":result.rows[0].email, 
+      "phone_number": result.rows[0].phone_number, "created_at": result.rows[0].created_at}
+    res.status(201).json(new_user);
   } catch (error) {
     if (error instanceof z.ZodError) {
       // Handle validation errors
@@ -192,7 +195,7 @@ router.put('/profile', middlewares.authHandler, async(req, res) =>{
       var_num += 1;
       update_string += 'password = $' + var_num.toString() + ' ';
       //hash password before insert
-      let hashed_pass:string = await(bcrypt.hash(updatedPass, salt_rounds));
+      let hashed_pass:string = await(argon2.hash(updatedPass));
       update_values.push(hashed_pass);
     }
     var_num += 1
