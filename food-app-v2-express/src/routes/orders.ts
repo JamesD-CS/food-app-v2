@@ -2,7 +2,6 @@ import express from 'express';
 import { OrderCreation, orderCreationSchema, orderUpdateSchema } from '../validator';
 import * as middlewares from '../middlewares';
 import pool from '../../db';
-import { z } from 'zod';
 import { QueryResult } from 'pg';
 require('dotenv').config();
 
@@ -240,19 +239,38 @@ router.get('/:order_id', async(req,res) =>{
 
   }
 
-}) 
+}); 
 
-/*change an order */
-router.put('/', async(req,res)=>{
+/*Cancel an order */
+router.delete('/:order_id', async(req,res) =>{
   //get user data from middleware authhandler
   let userdata = res.locals.userdata;
   let user_id = userdata.user_id;
+  let order_id = req.params.order_id;
   console.log('userdata:', userdata);
   console.log('user id:', userdata.user_id);
-
+  const updated_status = "Cancelled";
   
 
-})
+  try{
+    let update_status_query = {
+      text:"UPDATE orders SET order_status = $1 WHERE id = $2",
+      values: [updated_status, order_id]
+    }
+
+    let update_order_result = await pool.query(update_status_query);
+
+    console.log(update_order_result);
+
+    res.status(200).json({"message": "Order canceled successfully."});
+
+
+  }catch(error){
+    res.status(500).json({ message: "Error updating order" });
+
+  }
+
+});
 
 router.use(middlewares.notFound);
 router.use(middlewares.errorHandler);

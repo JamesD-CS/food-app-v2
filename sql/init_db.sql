@@ -57,12 +57,13 @@ CREATE TABLE menu_items (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TYPE status AS ENUM ('Pending', 'Processing', 'Delivered', 'Cancelled');
 CREATE TABLE orders (
     id SERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     restaurant_id INTEGER NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE,
     delivery_address_id INTEGER NOT NULL REFERENCES addresses(id),
-    order_status VARCHAR(50) NOT NULL,
+    order_status status,
     total_amount NUMERIC(10,2) NOT NULL,
     payment_status VARCHAR(50) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
