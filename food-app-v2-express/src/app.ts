@@ -9,6 +9,7 @@ import MessageResponse from './interfaces/MessageResponse';
 import pool from '../db';
 //import routes
 import restaurantRouter from './routes/restaurants';
+import categoriesRouter from './routes/categories';
 import addressRouter from './routes/addresses';
 import usersRouter from './routes/users';
 import ordersRouter from './routes/orders';
@@ -24,7 +25,7 @@ app.use(cors());
 app.use(express.json());
 
 /*Define routes for app to use */
-
+app.use('/restaurants/:restaurant_id/categories', categoriesRouter);
 app.use('/restaurants', restaurantRouter);
 app.use('/addresses', addressRouter);
 app.use('/users', usersRouter);

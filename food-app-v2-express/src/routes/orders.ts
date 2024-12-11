@@ -5,7 +5,6 @@ import pool from '../../db';
 import { QueryResult } from 'pg';
 require('dotenv').config();
 
-const app = express();
 const router = express.Router();
 
 router.use(express.json());

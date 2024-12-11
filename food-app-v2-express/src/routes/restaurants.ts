@@ -5,7 +5,6 @@ import pool from '../../db';
 import { z } from 'zod';
 require('dotenv').config();
 
-const app = express();
 const router = express.Router();
 
 router.use(express.json());

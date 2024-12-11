@@ -8,9 +8,7 @@ import * as argon2 from 'argon2';
 import * as jwt from 'jsonwebtoken';
 require('dotenv').config();
 
-const app = express();
 const router = express.Router();
-const salt_rounds:number = 10;
 
 router.use(express.json());
 
