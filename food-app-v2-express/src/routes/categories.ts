@@ -1,21 +1,28 @@
 import express from 'express';
-import { addressSchema } from '../validator';
 import * as middlewares from '../middlewares';
 import pool from '../../db';
-import { z } from 'zod';
 require('dotenv').config();
 
 const router = express.Router({mergeParams: true});
 
 router.use(express.json());
 
+interface GetRestId {
+  restaurant_id: Text
+}
+
 /* Get list of all categories */
 router.get('/', async (req, res) => {
 
-  const  restaurant_id  = req.params;  //console.log('rest_id is: ', restaurant_id);
-  console.log("restaurant id is:", restaurant_id);
+  let  restaurant_id  = <GetRestId>req.params;  
+  console.log("restaurant id is:", restaurant_id.restaurant_id);
+  //{restaurant_id:'1'}
   try {
-    const result = await pool.query("SELECT * FROM categories");
+    let get_restaurant_categories = {
+      text:"SELECT * FROM categories where restaurant_id = $1",
+      values:[restaurant_id.restaurant_id]
+    }
+    const result = await pool.query(get_restaurant_categories);
     let categories = result.rows;
 
     res.json({
