@@ -9,11 +9,21 @@ const app = express();
 const router = express.Router();
 
 router.use(express.json());
+router.use(middlewares.authHandler);
 
-/* Get list of all addresses */
+/* Get user addresses */
 router.get('/', async (req, res) => {
+
+  let userdata = res.locals.userdata;
+  let user_id = userdata.user_id;
+  console.log('user_id is:', user_id);
+
   try {
-    const result = await pool.query("SELECT * FROM addresses");
+    const get_addresses_query = {
+      text:"SELECT id, street, city, state, country, postal_code, latitude, longitude  FROM addresses WHERE user_id = $1",
+      values:[user_id]
+    }
+    const result = await pool.query(get_addresses_query);
     let addresses = result.rows;
 
     res.json({
@@ -25,49 +35,44 @@ router.get('/', async (req, res) => {
   }
 });
 
-/* Get restaurant details */
-router.get('/:restaurant_id/', async (req, res) => {
-  let restaurant_id = Number(req.params.restaurant_id);
-
-  const query = {
-    text: 'SELECT * FROM restaurants WHERE id = $1',
-    values: [restaurant_id]
-  
-  }
-
-  try {
-    const result = await pool.query(query);
-    let restaurant = result.rows;
-    res.json({
-      restaurant
-    });
-
-  } catch (error) {
-    console.error("Error reading from db", error);
-    res.status(500).json({ message: "Error fetching restaurant" });
-  }
-});
-
-/*Add a restaurant */
 router.post('/', async(req, res) =>{
+  let userdata = res.locals.userdata;
+  let user_id = userdata.user_id;
+  let restaurant_id = res.locals.restaurant_data;
 
-  //valdate json with zod
+  console.log('user_id is:', user_id);  //valdate json with zod
+
   try {
     const validatedData = addressSchema.parse(req.body);
 
     // Proceed with creating the user using validatedData
-   // const user = await createUser(validatedData);
+    // const user = await createUser(validatedData);
     console.log("data is valid:", validatedData);
 
     //insert restaurant data into db if valid
-    let rest_insert_query = {
-      text: 'INSERT INTO restaurants (name, description, phone_number, email) VALUES($1, $2, $3, $4 )',
-      //values: [validatedData.name, validatedData.description, validatedData.phone_number, validatedData.email]
+    let address_insert_query = {
+      text: 'INSERT INTO addresses (user_id, street, city, state, country, postal_code, latitude, longitude)' + 
+      'VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
+      values: [user_id, validatedData.street, validatedData.city, validatedData.state, validatedData.country, validatedData.postal_code, validatedData.latitude, validatedData.longitude]
     };
 
-    const result = await pool.query(rest_insert_query);
+    const result = await pool.query(address_insert_query);
+    let id = result.rows[0].id;
+
     console.log(result);
-    res.status(201).json({"response": "restaurant added to db"});
+
+    let reply_json = {
+      "id": id,
+      "user_id": user_id,
+      "street": validatedData.street,
+      "city": validatedData.city,
+      "state": validatedData.state,
+      "country": validatedData.country,
+      "postal_code": validatedData.postal_code,
+      "latitude": validatedData.latitude,
+      "longitude": validatedData.longitude
+    }
+    res.status(201).json(reply_json);
   } catch (error) {
     if (error instanceof z.ZodError) {
       // Handle validation errors
