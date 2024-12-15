@@ -179,19 +179,19 @@ router.put('/profile', middlewares.authHandler, async(req, res) =>{
 
     if (updatedName){
       var_num += 1;
-      update_string += 'name = $' + var_num.toString() + ' ';
+      update_string += 'name = $' + var_num.toString() + ', ';
       update_values.push(updatedName);
     }
 
     if (updatedPhone) {
       var_num += 1;
-      update_string += 'phone_number = $' + var_num.toString() + ' ';
+      update_string += 'phone_number = $' + var_num.toString() + ', ';
       update_values.push(updatedPhone);
     }
 
     if (updatedPass) {
       var_num += 1;
-      update_string += 'password = $' + var_num.toString() + ' ';
+      update_string += 'password = $' + var_num.toString() + ', ';
       //hash password before insert
       let hashed_pass:string = await(argon2.hash(updatedPass));
       update_values.push(hashed_pass);
@@ -202,8 +202,13 @@ router.put('/profile', middlewares.authHandler, async(req, res) =>{
 
     console.log(update_string, update_values);
 
+    const formattedUpdateString = (str: string): string => {
+      return str.replace(/,(\s*)WHERE/, '$1WHERE');
+    };
+
+
     let update_user_query ={
-      text: update_string + ' Returning *',
+      text: formattedUpdateString(update_string) + ' Returning *',
       values: update_values
     }
 
