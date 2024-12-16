@@ -39,9 +39,27 @@ router.get('/profile',middlewares.authHandler, async (req, res) => {
     values: [user_id]
   }
 
+  interface user{
+    id: number,
+    name: string,
+    email: string,
+    phone_number: string,
+    created_at: string,
+    addresses: string[],
+    password_hash?: string,
+  }
+
   try {
     const result = await pool.query(query);
-    let profile = result.rows;
+    let profile = <user>result.rows[0];
+    delete profile.password_hash;
+    //Retrieve user addresses from address table
+    let get_address_query = {
+      text:"SELECT * FROM addresses WHERE user_id = $1",
+      values:[user_id]
+    }
+    const addresses_result = await pool.query(get_address_query);
+    profile.addresses=addresses_result.rows;
     res.json({
       profile
     });
