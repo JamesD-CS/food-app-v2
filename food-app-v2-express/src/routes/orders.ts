@@ -10,6 +10,17 @@ const router = express.Router();
 router.use(express.json());
 router.use(middlewares.authHandler);
 
+interface Order{
+  id?: number;
+  address?:Address;
+}
+
+interface Address {
+  restaurant_id?: number;
+  user_id?:number;
+  [key: string]: any; // Other attributes are allowed
+}
+
 
 /* Get all user orders - authorization required */
 router.get('/', async (req, res) => {
@@ -197,8 +208,17 @@ router.get('/:order_id', async(req,res) =>{
     let menu_item_names = await pool.query(get_item_name_query);
 
     console.log(menu_item_names.rows);
-   
 
+    let get_address_query = {
+      text:"SELECT * FROM addresses WHERE id = $1",
+      values:[order[0].delivery_address_id]
+    }
+
+    const delivery_address = await pool.query(get_address_query);
+
+    console.log("delivery address:", delivery_address.rows[0]);
+   
+    delete delivery_address.rows[0].restaurant_id;
     //get menu item id and name from menu_items table
     //get restaurant name from restaurants table
     
@@ -215,7 +235,7 @@ router.get('/:order_id', async(req,res) =>{
         }));
     
         console.log("updated order items:", update_order_items);
-
+      order[0].delivery_address = delivery_address.rows[0];
       let order_details = 
       {
         id: order[0].id,
@@ -223,15 +243,19 @@ router.get('/:order_id', async(req,res) =>{
           id:order[0].restaurant_id,
           name: rest_name.rows[0].name
         },
-        order_items:update_order_items,
-        order
-  
+        "delivery_address":order[0].delivery_address,
+        "order_status": order[0].order_status,
+        "total_amount": order[0].total_amount,
+        "payment_status": order[0].payment_status,
+        "created_at": order[0].created_at,
+        "order_items":update_order_items,
+       
       }
 
     //console.log("order items:", order_items.rows);
-    res.json({
+    res.json(
       order_details
-    });
+    );
 
   }catch(error){
     res.status(500).json({ message: "Error getting order" });
@@ -250,7 +274,6 @@ router.delete('/:order_id', async(req,res) =>{
   console.log('user id:', userdata.user_id);
   const updated_status = "Cancelled";
   
-
   try{
     let update_status_query = {
       text:"UPDATE orders SET order_status = $1 WHERE id = $2",
