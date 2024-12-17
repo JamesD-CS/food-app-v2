@@ -88,10 +88,11 @@ router.post('/', async(req, res) =>{
 });
 
 /*Update an address */
-router.put('/', async(req, res) =>{
+router.put('/:address_id', async(req, res) =>{
 
   let userdata = res.locals.userdata;
   let user_id = userdata.user_id;
+  let address_id = req.params.address_id;
 
   try{
     let validatedAddressData = addressUpdateSchema.parse(req.body);
@@ -153,11 +154,15 @@ router.put('/', async(req, res) =>{
     update_string += 'WHERE user_id = $' + var_num.toString();
     update_values.push(user_id);
 
+    var_num += 1
+    update_string += ' AND id =$' + var_num.toString();
+    update_values.push(address_id);
+
     const formattedUpdateString = (str: string): string => {
       return str.replace(/,(\s*)WHERE/, '$1WHERE');
     };
 
-    //console.log(formattedUpdateString, update_values);
+    console.log(formattedUpdateString, update_values);
 
     let update_address_query ={
       text: formattedUpdateString(update_string) + ' Returning *',
@@ -167,8 +172,9 @@ router.put('/', async(req, res) =>{
 
     console.log('final update address query:', update_address_query);
 
-    
     const result = await pool.query(update_address_query);
+    console.log("update address result:",result);
+
     let updated_address = {"id": result.rows[0].id, "street":result.rows[0].street, "city": result.rows[0].city,
       "state":result.rows[0].state, "country":result.rows[0].country, "postal_code":result.rows[0].postal_code,
       "latitude":result.rows[0].latitude,"longitude":result.rows[0].longitude,"updated_at": result.rows[0].updated_at};

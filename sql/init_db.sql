@@ -36,7 +36,9 @@ CREATE TABLE addresses (
     country VARCHAR(100),
     postal_code VARCHAR(20),
     latitude DECIMAL(9,6),
-    longitude DECIMAL(9,6)
+    longitude DECIMAL(9,6),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE categories (
