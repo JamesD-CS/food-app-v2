@@ -139,7 +139,7 @@ router.get('/login', async (req, res) => {
 });
 
 /*Add a user */
-router.post('/', async(req, res) =>{
+router.post('/register', async(req, res) =>{
   //valdate json with zod
   try {
     const validatedData = userRegistrationSchema.parse(req.body);

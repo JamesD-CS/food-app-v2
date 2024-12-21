@@ -12,6 +12,9 @@ export default defineConfig({
     watch: {
       usePolling: true,
     },
+    fs: {
+      cachedChecks: false
+    },
     port: 6970,
     strictPort: true,
     host: true,
