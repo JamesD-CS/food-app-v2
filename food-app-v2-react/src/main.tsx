@@ -4,6 +4,7 @@ import {BrowserRouter , Routes, Route} from "react-router";
 import App from './App.tsx'
 import Login from './login.tsx'
 import Signup from './signup.tsx'
+import Profile from './profile.tsx'
 
 const root = document.getElementById("root")!;
 
@@ -14,8 +15,9 @@ ReactDOM.createRoot(root).render(
 
       <Route path="login" element ={<Login />} />,
 
-      <Route path="signup" element ={<Signup />} />
+      <Route path="signup" element ={<Signup />} />,
 
+      <Route path="profile" element ={<Profile />} />
       
     </Routes>
   </BrowserRouter>

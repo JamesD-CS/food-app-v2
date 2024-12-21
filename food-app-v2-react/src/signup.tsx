@@ -3,7 +3,6 @@ import './App.css'
 import { MessageModal } from './message_modal';
 const apiUrl = import.meta.env.VITE_API_URL;
 import React, { useState, useEffect, FormEvent } from 'react';
-import { createPortal } from 'react-dom';
 
 interface FormData {
   name: string;

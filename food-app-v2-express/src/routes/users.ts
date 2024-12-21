@@ -87,7 +87,7 @@ router.get('/', async (req, res) => {
 
 
 
-router.get('/login', async (req, res) => {
+router.post('/login', async (req, res) => {
   //user id in req.body
   let pass = req.body.password;
   let email = req.body.email;

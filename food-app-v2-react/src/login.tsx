@@ -3,7 +3,6 @@ import './App.css'
 import { MessageModal } from './message_modal';
 const apiUrl = import.meta.env.VITE_API_URL;
 import React, { useState, useEffect, FormEvent } from 'react';
-import { createPortal } from 'react-dom';
 
 interface FormData {
   email: string;
@@ -13,6 +12,7 @@ interface FormData {
 const LoginComponent: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isFadingOut, setIsFadingOut] = useState<boolean>(false);
+  const navigate = useNavigate();
 
 
   const [formData, setFormData] = useState<FormData>({
@@ -32,7 +32,7 @@ const LoginComponent: React.FC = () => {
     e.preventDefault();
     const jsonData = JSON.stringify(formData);
     console.log(jsonData);
-    /*
+    
     try {
       const response = await fetch(apiUrl + '/users/login', {
         method: 'POST',
@@ -52,25 +52,18 @@ const LoginComponent: React.FC = () => {
 
       console.log('Form submitted successfully:', result);
       setIsModalOpen(true);
-        setIsFadingOut(false);
+      setIsFadingOut(false);
 
 
       // Optionally reset the form
-      setFormData({ name: '', email: '', phone_number: '', password: '' });
+      setFormData({email: '', password: '' });
+      navigate('/profile', { replace: true });
+
       
     } catch (error) {
       console.error('Error submitting form:', error);
     }
-      */
-    //delete this block when done ui testing
-    console.log('Form submitted successfully:');
-    setIsModalOpen(true);
-    setIsFadingOut(false);
-    //end block delete
-
-    // Optionally reset the form
-    setFormData({ email: '', password: '' });
-
+      
   };
 
   useEffect(() => {
@@ -92,6 +85,7 @@ const LoginComponent: React.FC = () => {
       setIsModalOpen(false);
     }
   };
+  
 
   return (
 
