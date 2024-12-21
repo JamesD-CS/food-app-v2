@@ -1,5 +1,6 @@
 import {useNavigate} from 'react-router'
 import './App.css'
+import { MessageModal } from './message_modal';
 const apiUrl = import.meta.env.VITE_API_URL;
 import React, { useState, useEffect, FormEvent } from 'react';
 import { createPortal } from 'react-dom';
@@ -11,38 +12,9 @@ interface FormData {
   password: string;
 }
 
-interface ModalProps {
-  children: React.ReactNode;
-  isFadingOut: boolean;
-  onTransitionEnd: () => void;
-}
-
-const Modal: React.FC<ModalProps> = ({ children, isFadingOut, onTransitionEnd }) => {
-  const modalRoot = document.getElementById('modal-root');
-  if (!modalRoot) {
-    // If no modal-root is found, return null or handle it gracefully.
-    return null;
-  }
-
-  // The inline styles are adjusted to use a CSS class for transitions.
-  // We'll rely on a className that toggles for the fade-out effect.
-  return createPortal(
-    <div 
-      className={`modal-overlay ${isFadingOut ? 'fade-out' : ''}`}
-      onTransitionEnd={onTransitionEnd}
-    >
-      <div className="modal-content">
-        {children}
-      </div>
-    </div>,
-    modalRoot
-  );
-};
-
 const RegistrationForm: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isFadingOut, setIsFadingOut] = useState<boolean>(false);
-
 
   const [formData, setFormData] = useState<FormData>({
     name: '',
@@ -102,8 +74,6 @@ const RegistrationForm: React.FC = () => {
     // Optionally reset the form
     setFormData({ name: '', email: '', phone_number: '', password: '' });
 
-   
-      
   };
 
   useEffect(() => {
@@ -187,9 +157,9 @@ const RegistrationForm: React.FC = () => {
       <button type="submit">Submit</button>
     </form>
     {isModalOpen && (
-        <Modal isFadingOut={isFadingOut} onTransitionEnd={handleTransitionEnd}>
+        <MessageModal isFadingOut={isFadingOut} onTransitionEnd={handleTransitionEnd}>
           <p>Registration successful!</p>
-        </Modal>
+        </MessageModal>
       )}
     </div>
   );
