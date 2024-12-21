@@ -4,8 +4,6 @@ import { MessageModal } from './message_modal';
 const apiUrl = import.meta.env.VITE_API_URL;
 import React, { useState, useEffect, FormEvent } from 'react';
 import cookies from 'js-cookie';
-import { useLocalStorage } from 'usehooks-ts';
-
 
 interface FormData {
   email: string;

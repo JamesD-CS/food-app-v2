@@ -24,6 +24,13 @@ function App() {
             </Link>
           </h2>
         </li>
+        <li className="navbar">
+          <h2>
+            <Link to={'/restaurants'} >
+              Restaurants
+            </Link>
+          </h2>
+        </li>
       </ul>
     </>
   )
