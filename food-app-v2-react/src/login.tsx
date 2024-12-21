@@ -3,6 +3,9 @@ import './App.css'
 import { MessageModal } from './message_modal';
 const apiUrl = import.meta.env.VITE_API_URL;
 import React, { useState, useEffect, FormEvent } from 'react';
+import cookies from 'js-cookie';
+import { useLocalStorage } from 'usehooks-ts';
+
 
 interface FormData {
   email: string;
@@ -53,6 +56,13 @@ const LoginComponent: React.FC = () => {
       console.log('Form submitted successfully:', result);
       setIsModalOpen(true);
       setIsFadingOut(false);
+
+      cookies.set('token', result.token, { expires: 2, secure: true });
+      cookies.set('user_name', result.user.name, { expires: 2, secure: true });
+      cookies.set('id', result.user.id, { expires: 2, secure: true });
+      cookies.set('email', result.user.email, { expires: 2, secure: true });
+      cookies.set('phone_number', result.user.phone_number, { expires: 2, secure: true });
+
 
 
       // Optionally reset the form
