@@ -1,7 +1,7 @@
-import React, { useState, useEffect, FormEvent } from 'react';
+import React, { useState, useEffect } from 'react';
 import cookies from 'js-cookie';
 const apiUrl = import.meta.env.VITE_API_URL;
-import { useLocalStorage } from 'usehooks-ts';
+import {Link} from 'react-router';
 import  { Restaurant } from './app_types';
 
 interface RestaurantTableProps {
@@ -9,7 +9,7 @@ interface RestaurantTableProps {
 }
 
 const RestaurantTable: React.FC<RestaurantTableProps> = ({ restaurants }) => {
-
+ 
   if (!Array.isArray(restaurants)) {
     return <div>No data available</div>;
   }
@@ -32,9 +32,13 @@ const RestaurantTable: React.FC<RestaurantTableProps> = ({ restaurants }) => {
       </thead>
       <tbody>
         {restaurants.map((restaurant) => (
+         
           <tr key={restaurant.id}>
             <td >{restaurant.id}</td>
-            <td >{restaurant.name}</td>
+            <Link to={'/rest_details'}  
+            state={{ id: restaurant.id, name:restaurant.name }}>
+              <td >{restaurant.name}</td>
+            </Link>
             <td >{restaurant.description}</td>
             <td >{restaurant.phone_number}</td>
             <td >{restaurant.email}</td>

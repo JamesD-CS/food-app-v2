@@ -6,6 +6,7 @@ import Login from './login.tsx'
 import Signup from './signup.tsx'
 import Profile from './profile.tsx'
 import Restaurants  from './restaurants.tsx';
+import RestDetails from './rest_details.tsx'
 
 const root = document.getElementById("root")!;
 
@@ -21,6 +22,8 @@ ReactDOM.createRoot(root).render(
       <Route path="profile" element ={<Profile />} />
 
       <Route path="restaurants" element ={<Restaurants />} />
+
+      <Route path="rest_details" element ={<RestDetails />} />
 
     </Routes>
   </BrowserRouter>
