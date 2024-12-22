@@ -15,9 +15,18 @@ export type Restaurant = {
 
 }
 
+export type Category = {
+  id: string
+  name:string
+}
+
 export type Menu_item = {
-    menu_item_id:number
-    quantity:number
+    id: number
+    name: string
+    description: string
+    price: number
+    is_available: boolean
+    category: Category
 }
 
 /*
