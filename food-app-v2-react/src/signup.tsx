@@ -41,9 +41,10 @@ const RegistrationForm: React.FC = () => {
     e.preventDefault();
     const jsonData = JSON.stringify(formData);
     console.log(jsonData);
-    /*
+    let fetchUrl = apiUrl + '/users/register';
+    console.log("Fetching url:", fetchUrl);
     try {
-      const response = await fetch(apiUrl + '/users/register', {
+      const response = await fetch(fetchUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -69,12 +70,7 @@ const RegistrationForm: React.FC = () => {
     } catch (error) {
       console.error('Error submitting form:', error);
     }
-      */
-    //delete this block when done ui testing
-    console.log('Form submitted successfully:');
-    setIsModalOpen(true);
-    //end block delete
-
+    
     // Optionally reset the form
     setFormData({ name: '', email: '', phone_number: '', password: '' });
 
