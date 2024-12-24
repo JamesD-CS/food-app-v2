@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useEffect, useState } from 'react';
 import { useLocalStorage } from 'usehooks-ts';
 import { Item, Order, Menu_item } from './app_types';
 

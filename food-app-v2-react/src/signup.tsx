@@ -1,7 +1,7 @@
 import {useNavigate} from 'react-router'
 import './App.css'
 const apiUrl = import.meta.env.VITE_API_URL;
-import React, { useState, useEffect, FormEvent } from 'react';
+import React, { useState, FormEvent } from 'react';
 import FadeOutModal from './FadeOutModal'; // <-- Import the FadeOutModal component
 
 
