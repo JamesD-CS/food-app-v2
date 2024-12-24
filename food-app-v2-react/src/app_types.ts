@@ -3,7 +3,7 @@ export type Item = {
     item_name: string
     item_description: string
     price: number
-    
+    quantity:number 
   }
 
 export type Restaurant = {
@@ -27,6 +27,7 @@ export type Menu_item = {
     price: number
     is_available: boolean
     category: Category
+    quantity?:number
 }
 
 /*

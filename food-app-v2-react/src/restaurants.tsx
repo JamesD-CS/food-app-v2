@@ -35,10 +35,10 @@ const RestaurantTable: React.FC<RestaurantTableProps> = ({ restaurants }) => {
          
           <tr key={restaurant.id}>
             <td >{restaurant.id}</td>
-            <Link to={'/rest_details'}  
-            state={{ id: restaurant.id, name:restaurant.name }}>
-              <td >{restaurant.name}</td>
-            </Link>
+           
+              <td > <Link to={'/rest_details' }  
+            state={{ id: restaurant.id, name:restaurant.name }}>{restaurant.name}</Link>
+            </td>
             <td >{restaurant.description}</td>
             <td >{restaurant.phone_number}</td>
             <td >{restaurant.email}</td>
@@ -87,7 +87,6 @@ const Restaurants:React.FC = () => {
       }, []);
 
     return(
-
       <RestaurantTable restaurants={data} />
 
     )

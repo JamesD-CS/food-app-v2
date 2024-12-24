@@ -1,8 +1,9 @@
 import {useNavigate} from 'react-router'
 import './App.css'
-import { MessageModal } from './message_modal';
 const apiUrl = import.meta.env.VITE_API_URL;
 import React, { useState, useEffect, FormEvent } from 'react';
+import FadeOutModal from './FadeOutModal'; // <-- Import the FadeOutModal component
+
 
 interface FormData {
   name: string;
@@ -13,7 +14,7 @@ interface FormData {
 
 const RegistrationForm: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [isFadingOut, setIsFadingOut] = useState<boolean>(false);
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState<FormData>({
     name: '',
@@ -29,6 +30,12 @@ const RegistrationForm: React.FC = () => {
       [name]: value,
     }));
   };
+
+  const onModalClose = () => {
+    setIsModalOpen(true);
+    navigate('/login', { replace: true });
+
+  }
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -54,7 +61,6 @@ const RegistrationForm: React.FC = () => {
 
       console.log('Form submitted successfully:', result);
       setIsModalOpen(true);
-        setIsFadingOut(false);
 
 
       // Optionally reset the form
@@ -67,7 +73,6 @@ const RegistrationForm: React.FC = () => {
     //delete this block when done ui testing
     console.log('Form submitted successfully:');
     setIsModalOpen(true);
-    setIsFadingOut(false);
     //end block delete
 
     // Optionally reset the form
@@ -75,29 +80,17 @@ const RegistrationForm: React.FC = () => {
 
   };
 
-  useEffect(() => {
-    let timer: ReturnType<typeof setTimeout>;
-    if (isModalOpen && !isFadingOut) {
-      timer = setTimeout(() => {
-        setIsFadingOut(true);
-      }, 2000); // 2000ms = 2 seconds
-    }
-
-    return () => {
-      if (timer) clearTimeout(timer);
-    };
-  }, [isModalOpen]);
-
-  const handleTransitionEnd = () => {
-    if (isFadingOut) {
-      // Once the fade-out transition ends, close the modal fully
-      setIsModalOpen(false);
-    }
-  };
-
   return (
 
     <div id="modal-root">   
+    <FadeOutModal
+          isOpen={isModalOpen}
+          onClose={() => onModalClose()}
+          showDuration={500}  // Wait (x)ms before starting fade
+          fadeDuration={200}   // 0.5s fade-out transition
+        >
+          <p>Signup Successful</p>
+      </FadeOutModal>
 
     <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', width: '300px', gap: '10px' }}>
 
@@ -155,11 +148,7 @@ const RegistrationForm: React.FC = () => {
 
       <button type="submit">Submit</button>
     </form>
-    {isModalOpen && (
-        <MessageModal isFadingOut={isFadingOut} onTransitionEnd={handleTransitionEnd}>
-          <p>Registration successful!</p>
-        </MessageModal>
-      )}
+    
     </div>
   );
 };

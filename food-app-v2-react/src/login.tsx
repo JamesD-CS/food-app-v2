@@ -1,9 +1,9 @@
 import {useNavigate} from 'react-router'
 import './App.css'
-import { MessageModal } from './message_modal';
 const apiUrl = import.meta.env.VITE_API_URL;
-import React, { useState, useEffect, FormEvent } from 'react';
+import React, { useState, FormEvent } from 'react';
 import cookies from 'js-cookie';
+import FadeOutModal from './FadeOutModal'; // <-- Import the FadeOutModal component
 
 interface FormData {
   email: string;
@@ -12,7 +12,6 @@ interface FormData {
 
 const LoginComponent: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [isFadingOut, setIsFadingOut] = useState<boolean>(false);
   const navigate = useNavigate();
 
 
@@ -28,6 +27,11 @@ const LoginComponent: React.FC = () => {
       [name]: value,
     }));
   };
+
+  const onModalClose = () =>{
+    setIsModalOpen(false)
+    navigate('/profile', { replace: true });
+  }
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -53,7 +57,6 @@ const LoginComponent: React.FC = () => {
 
       console.log('Form submitted successfully:', result);
       setIsModalOpen(true);
-      setIsFadingOut(false);
 
       cookies.set('token', result.token, { expires: 2, secure: true });
       cookies.set('user_name', result.user.name, { expires: 2, secure: true });
@@ -65,8 +68,6 @@ const LoginComponent: React.FC = () => {
 
       // Optionally reset the form
       setFormData({email: '', password: '' });
-      navigate('/profile', { replace: true });
-
       
     } catch (error) {
       console.error('Error submitting form:', error);
@@ -74,30 +75,16 @@ const LoginComponent: React.FC = () => {
       
   };
 
-  useEffect(() => {
-    let timer: ReturnType<typeof setTimeout>;
-    if (isModalOpen && !isFadingOut) {
-      timer = setTimeout(() => {
-        setIsFadingOut(true);
-      }, 2000); // 2000ms = 2 seconds
-    }
-
-    return () => {
-      if (timer) clearTimeout(timer);
-    };
-  }, [isModalOpen]);
-
-  const handleTransitionEnd = () => {
-    if (isFadingOut) {
-      // Once the fade-out transition ends, close the modal fully
-      setIsModalOpen(false);
-    }
-  };
-  
-
   return (
-
-    <div id="modal-root">   
+    <>
+    <FadeOutModal
+          isOpen={isModalOpen}
+          onClose={() => onModalClose()}
+          showDuration={500}  // Wait (x)ms before starting fade
+          fadeDuration={200}   // 0.5s fade-out transition
+        >
+          <p>Login Successful</p>
+      </FadeOutModal>
 
     <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', width: '300px', gap: '10px' }}>
 
@@ -129,12 +116,7 @@ const LoginComponent: React.FC = () => {
 
       <button type="submit">Login</button>
     </form>
-    {isModalOpen && (
-        <MessageModal isFadingOut={isFadingOut} onTransitionEnd={handleTransitionEnd}>
-          <p>Login successful!</p>
-        </MessageModal>
-      )}
-    </div>
+    </>
   );
 };
 

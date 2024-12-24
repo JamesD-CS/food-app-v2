@@ -1,24 +1,28 @@
-import { createContext, useContext } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { useLocalStorage } from 'usehooks-ts';
-import { Item, Order } from './app_types';
+import { Item, Order, Menu_item } from './app_types';
 
-export type CartContextType = {
-    cartItems:Order[] | null
-    addToCart: (item: Item) => void;
+export interface CartContextType  {
+    storeId: string | null;
+    cartItems:Menu_item[] | null;
+    addToCart: (item: Menu_item) => void;
     removeItem:(item_id:number)=> void;
     updateQuantity:(item_id:number, ammount:number)=>void;
     clearCart:() => void;
     getItemCount:() => number;
-    getCartItems:() => Order[];
+    getCartItems:() => Menu_item[];
     getCartTotal:() => number;
     getIsLoggedIn:() => boolean;
     setIsLoggedIn:(isloggedin:boolean) => void;
+    setStoreId:(id:string) => void;
 
   }
  
+
 export const CartContext = createContext<CartContextType | null>({
+  storeId: null,
   cartItems: null,
-  addToCart: (item:Item) => null,
+  addToCart: (item:Menu_item) => null,
   removeItem:(item_id:number) => null,
   updateQuantity:(item_id:number, ammount:number)=>null,
   clearCart:() => null,
@@ -26,44 +30,69 @@ export const CartContext = createContext<CartContextType | null>({
   getCartItems:  () => [],
   getCartTotal: () => 0,
   getIsLoggedIn:() => false,
-  setIsLoggedIn:(isloggedin:boolean) => false
+  setIsLoggedIn:(isloggedin:boolean) => false,
+  setStoreId:(id:string) => null
 });
 
-//export const useCartContext = () => useContext(CartContext);
+interface CartProviderProps {
+  children: React.ReactNode;
+}
 
-export const CartProvider = ({ children }: { children: React.ReactNode }) => {
-    const[cartItems, setCartItems] = useLocalStorage('cart_items', [] as Order[]);
+//export const CartProvider:React.FC<CartProviderProps> = ({ children }: { children: React.ReactNode }) => {
+  export const CartProvider: React.FC<CartProviderProps> = ({
+    children,
+  }) => {
+    //const [storeId, setStoreId] = useLocalStorage('store_id', null);
+    const [storeId, setStoreIdState] = useState<string | null>(null);
+    const[cartItems, setCartItems] = useLocalStorage('cart_items', [] as Menu_item[]);
     const[isLoggedIn, setLoggedIn] = useLocalStorage('is_logged_in', false);
+
+    // Optional: Persist cart to localStorage for each store
+  useEffect(() => {
+    const savedCart = localStorage.getItem(`store-cart-${storeId}`);
+    if (savedCart) {
+      setCartItems(JSON.parse(savedCart));
+    }
+  }, [storeId]);
+
+  useEffect(() => {
+    localStorage.setItem(`store-cart-${storeId}`, JSON.stringify(cartItems));
+  }, [cartItems, storeId]);
   
+
+  const setStoreId = (id: string) => {
+    setStoreIdState(id);
+  };
+
     const isItemInCart = (searchId:number):boolean => {
-      return cartItems.some(order => order.item_id === searchId);
+      return cartItems.some(order => order.id === searchId);
     }
 
-    const addToCart = (item:Item) => {
+    const addToCart = (item:Menu_item) => {
       
-      if (isItemInCart(item.item_id)) {
+      if (isItemInCart(item.id)) {
 
         setCartItems(
           cartItems.map((cartItem) =>
-            cartItem.item_id === item.item_id
-              ? { ...cartItem, quantity: cartItem.quantity + 1 }
+            cartItem.id === item.id
+              ? { ...cartItem, quantity: cartItem.quantity! + 1 }
               : cartItem
           )
         );
 
       } else {
-        let newItem:Order = {item_id: item.item_id, item_name:item.item_name, 
-          quantity:1, price:item.price};
+        let newItem:Menu_item = {id: item.id, name:item.name, 
+          quantity:1, price:item.price, description:item.description, is_available:item.is_available, category:item.category};
         setCartItems([...cartItems, newItem]);
+
       }
-      
     };
 
     const removeItem =(item_id:number)=>{
       console.log('in cart context remove item');
       let n:number = 0;
       while (n < cartItems.length){
-        if(cartItems[n].item_id === item_id){
+        if(cartItems[n].id === item_id){
           cartItems.splice(n, 1);
           setCartItems(cartItems);
           break;
@@ -83,8 +112,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       if (isItemInCart(item_id)) {
         setCartItems(
           cartItems.map((cartItem) =>
-            cartItem.item_id === item_id
-              ? { ...cartItem, quantity: cartItem.quantity + change }
+            cartItem.id === item_id
+              ? { ...cartItem, quantity: cartItem.quantity! + change }
               : cartItem
           )
         );
@@ -93,26 +122,26 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     };
   
     const clearCart = () => {
-      let cartItems = [] as Order[];
+      let cartItems = [] as Menu_item[];
       setCartItems(cartItems);
     };
 
     const getItemCount = ():number =>{
       let count:number = 0;
-      cartItems.forEach(function(item:Order){
-        count = count + item.quantity;
+      cartItems.forEach(function(item:Menu_item){
+        count = count + item.quantity!;
       });
       return count;
     }
 
-    const getCartItems = ():Order[]=>{
+    const getCartItems = ():Menu_item[]=>{
       return cartItems;
     }
   
     const getCartTotal = ():number => {
       let total:number = 0;
-      cartItems.forEach(function(item:Order){
-        total = total + item.quantity * item.price;
+      cartItems.forEach(function(item:Menu_item){
+        total = total + item.quantity! * item.price;
       });
       return total;
     };
@@ -128,6 +157,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     return (
       <CartContext.Provider
         value={{
+          storeId,
           cartItems,
           addToCart,
           removeItem,
@@ -137,7 +167,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
           getCartItems,
           getCartTotal,
           getIsLoggedIn,
-          setIsLoggedIn
+          setIsLoggedIn,
+          setStoreId
         }}
       >
         {children}

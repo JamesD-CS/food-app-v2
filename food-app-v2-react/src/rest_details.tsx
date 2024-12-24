@@ -1,7 +1,11 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useContext} from 'react';
 import { useLocation } from 'react-router';
 import cookies from 'js-cookie';
 import { Category, Menu_item } from './app_types';
+import { CartContext } from "./cart_context.tsx";
+import FadeOutModal from './FadeOutModal'; // <-- Import the FadeOutModal component
+
+
 const apiUrl = import.meta.env.VITE_API_URL;
 
 interface MenuTableProps {
@@ -9,63 +13,86 @@ interface MenuTableProps {
     menu_items:Menu_item[];
 }
 
-const MenuTable: React.FC<MenuTableProps> = ({ categories, menu_items }) => {
-    // Group menu items by their category
-    const groupedItems = categories.map((category) => {
-      const items = menu_items.filter((item) => item.category.id === category.id);
-      return { category, items };
-    });
-  
-    return (
-      <table>
-        <thead>
-          <tr>
-            {/* Example header row. Adjust columns as needed */}
-            <th style={{ textAlign: "left" }}>Name</th>
-            <th style={{ textAlign: "left" }}>Description</th>
-            <th style={{ textAlign: "left" }}>Price</th>
-            <th style={{ textAlign: "left" }}>Available</th>
-          </tr>
-        </thead>
-        <tbody>
-          {groupedItems.map(({ category, items }) => (
-            // Use React fragments to group <tr> elements without introducing extra DOM nodes
-            <React.Fragment key={category.id}>
-              {/* Category heading row */}
-              <tr>
-                <th colSpan={4} style={{ textAlign: "left" }}>
-                  {category.name}
-                </th>
-              </tr>
-              {/* Rows for items within this category */}
-              {items.map((item) => (
-                <tr key={item.id}>
-                  <td>{item.name}</td>
-                  <td>{item.description}</td>
-                  <td>{item.price}</td>
-                  <td>{item.is_available ? "Yes" : "No"}</td>
-                </tr>
-              ))}
-            </React.Fragment>
-          ))}
-        </tbody>
-      </table>
-    );
-  };
-
 const RestDetails: React.FC = () => {
     let restaurant_info = useLocation();
     let rest_name:string = restaurant_info.state.name;
     let rest_id:string = restaurant_info.state.id;
+
 
     const token = cookies.get('token');
     const user_name= cookies.get('user_name');
     const email= cookies.get('email');
     const [menu_items, setMenuItems]= useState<Menu_item[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
+    const  cartContext = useContext(CartContext);
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+
+    const MenuTable: React.FC<MenuTableProps> = ({ categories, menu_items }) => {
+      // Group menu items by their category
+      const groupedItems = categories.map((category) => {
+        const items = menu_items.filter((item) => item.category.id === category.id);
+        return { category, items };
+      });
+    
+      return (
+        <table>
+          <thead>
+            <tr>
+              {/* Example header row. Adjust columns as needed */}
+              <th style={{ textAlign: "left" }}>Name</th>
+              <th style={{ textAlign: "left" }}>Description</th>
+              <th style={{ textAlign: "left" }}>Price</th>
+              <th style={{ textAlign: "left" }}>Available</th>
+            </tr>
+          </thead>
+          <tbody>
+            {groupedItems.map(({ category, items }) => (
+              // Use React fragments to group <tr> elements without introducing extra DOM nodes
+              <React.Fragment key={category.id}>
+                {/* Category heading row */}
+                <tr>
+                  <th colSpan={4} style={{ textAlign: "left" }}>
+                    {category.name}
+                  </th>
+                </tr>
+                {/* Rows for items within this category */}
+                {items.map((item) => (
+                  <tr key={item.id}>
+                    <td>{item.name}</td>
+                    <td>{item.description}</td>
+                    <td>{item.price}</td>
+                    <td>{item.is_available ? "Yes" : "No"}</td>
+                    <td><button type="button" onClick={() => addToCart(item)}>Add</button></td>
+                  </tr>
+                ))}
+              </React.Fragment>
+            ))}
+          </tbody>
+        </table>
+      );
+    };
+
+    const addToCart =(item:Menu_item) => {
+      cartContext?.addToCart(item);
+      setIsModalOpen(true);
+    
+    };
+    
+    const showCart = () => {
+      console.log("cart item count",cartContext?.getItemCount())
+      console.log(cartContext?.getCartItems())
+    };
+
+    const clearCart = () => {
+      cartContext?.clearCart();
+    }
+
 
     useEffect(() => {
         setMenuItems([]);
+        cartContext?.setStoreId(rest_id);
         const requestOptions = {
           method: 'GET',
           headers: { 
@@ -105,15 +132,31 @@ const RestDetails: React.FC = () => {
       }, []);
 
     return(
+      
         <>
+        <button type="button" onClick={() => showCart()}>Show Cart</button>
+        <button type="button" onClick={() => clearCart()}>Clear Cart</button>
+
+        <FadeOutModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          showDuration={500}  // Wait 2s before starting fade
+          fadeDuration={200}   // 0.5s fade-out transition
+        >
+          <p>Item Added!</p>
+      </FadeOutModal>
         <h2>
         {rest_name}
         <br />
         Restaurant Id:{rest_id}
         </h2>
+        Cart items: {cartContext?.getItemCount()}
+
         <br />
+
         <MenuTable categories ={categories} menu_items={menu_items}/>
         </>
+
     )
 
 }
