@@ -64,3 +64,26 @@ ul{
   text-align: center;
   color: black;
 }
+
+.card-view {
+  table, th, tr {
+    border: 1px solid black;
+  }
+  
+  table tbody, 
+  table thead {
+    display: grid;
+    grid-auto-flow: row dense;
+    grid-template-columns: repeat(4, 1fr);
+    grid-gap: 10px;
+    grid-auto-rows: minmax(300px, auto);
+  
+  }
+  
+  table td {
+    display: block;
+  }
+  table thead {
+    display: none;
+  }
+}

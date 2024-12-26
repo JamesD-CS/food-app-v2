@@ -71,9 +71,6 @@ const RegistrationForm: React.FC = () => {
       console.error('Error submitting form:', error);
     }
     
-    // Optionally reset the form
-    setFormData({ name: '', email: '', phone_number: '', password: '' });
-
   };
 
   return (

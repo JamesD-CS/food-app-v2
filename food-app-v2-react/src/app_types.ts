@@ -43,6 +43,20 @@ export type Menu_item = {
 ] 
 */
 
+export type Address = {
+
+    id?: number,
+    user_id?: number,
+    street: string,
+    city: string,
+    state: string,
+    country: string,
+    postal_code: string,
+    latitude?: number,
+    longitude?: number
+
+}
+
 export type Order = {
       item_id: number
       user_id?: number
