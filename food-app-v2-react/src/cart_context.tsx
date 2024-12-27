@@ -6,6 +6,7 @@ export interface CartContextType  {
     storeId: string | null;
     cartItems:Menu_item[] | null;
     userId:string | null;
+    addressId: string | null;
     addToCart: (item: Menu_item) => void;
     removeItem:(item_id:number)=> void;
     updateQuantity:(item_id:number, ammount:number)=>void;
@@ -18,6 +19,8 @@ export interface CartContextType  {
     setStoreId:(store_id:string) => void;
     setUserId:(user_id:string) => void;
     getUserId:() => string | null;
+    setAddressId:(address_id:string) => void;
+    getAddressId:() => string | null;
 
   }
  
@@ -26,6 +29,7 @@ export const CartContext = createContext<CartContextType | null>({
   storeId: null,
   cartItems: null,
   userId: null,
+  addressId: null,
   addToCart: (item:Menu_item) => null,
   removeItem:(item_id:number) => null,
   updateQuantity:(item_id:number, ammount:number)=>null,
@@ -37,7 +41,9 @@ export const CartContext = createContext<CartContextType | null>({
   setIsLoggedIn:(isloggedin:boolean) => false,
   setStoreId:(store_id:string) => null,
   setUserId:(user_id:string) => null,
-  getUserId:() => null
+  getUserId:() => null,
+  setAddressId:(address_id:string) => null,
+  getAddressId:() => null
 });
 
 interface CartProviderProps {
@@ -51,34 +57,42 @@ interface CartProviderProps {
     //const [storeId, setStoreId] = useLocalStorage('store_id', null);
     const [storeId, setStoreIdState] = useState<string | null>(null);
     const [userId, setUserIdState] = useState<string | null>(null);
-
+    const [addressId, setAddressIdState] = useState<string | null>(null);
     const[cartItems, setCartItems] = useLocalStorage('cart_items', [] as Menu_item[]);
     const[isLoggedIn, setLoggedIn] = useLocalStorage('is_logged_in', false);
 
     // Optional: Persist cart to localStorage for each store
-  useEffect(() => {
-    const savedCart = localStorage.getItem(`store-cart-${storeId}`);
-    if (savedCart) {
-      setCartItems(JSON.parse(savedCart));
+    useEffect(() => {
+      const savedCart = localStorage.getItem(`store-cart-${storeId}`);
+      if (savedCart) {
+        setCartItems(JSON.parse(savedCart));
+      }
+    }, [storeId]);
+
+    useEffect(() => {
+      localStorage.setItem(`store-cart-${storeId}`, JSON.stringify(cartItems));
+    }, [cartItems, storeId]);
+    
+
+    const setStoreId = (store_id: string) => {
+      setStoreIdState(store_id);
+    };
+
+    const setUserId = (user_id:string) => {
+      setUserIdState(user_id);
     }
-  }, [storeId]);
 
-  useEffect(() => {
-    localStorage.setItem(`store-cart-${storeId}`, JSON.stringify(cartItems));
-  }, [cartItems, storeId]);
-  
+    const getUserId = () =>{
+      return userId;
+    }
 
-  const setStoreId = (store_id: string) => {
-    setStoreIdState(store_id);
-  };
+    const setAddressId = (address_id: string) => {
+      setAddressIdState(address_id);
+    }
 
-  const setUserId = (user_id:string) => {
-    setUserIdState(user_id);
-  }
-
-  const getUserId = () =>{
-    return userId;
-  }
+    const getAddressId = () => {
+      return addressId;
+    }
 
     const isItemInCart = (searchId:number):boolean => {
       return cartItems.some(order => order.id === searchId);
@@ -176,6 +190,7 @@ interface CartProviderProps {
           storeId,
           cartItems,
           userId,
+          addressId,
           addToCart,
           removeItem,
           updateQuantity,
@@ -187,7 +202,9 @@ interface CartProviderProps {
           setIsLoggedIn,
           setStoreId,
           getUserId,
-          setUserId
+          setUserId,
+          setAddressId,
+          getAddressId
         }}
       >
         {children}
