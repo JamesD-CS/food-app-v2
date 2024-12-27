@@ -5,6 +5,7 @@ import { Item, Order, Menu_item } from './app_types';
 export interface CartContextType  {
     storeId: string | null;
     cartItems:Menu_item[] | null;
+    userId:string | null;
     addToCart: (item: Menu_item) => void;
     removeItem:(item_id:number)=> void;
     updateQuantity:(item_id:number, ammount:number)=>void;
@@ -14,7 +15,9 @@ export interface CartContextType  {
     getCartTotal:() => number;
     getIsLoggedIn:() => boolean;
     setIsLoggedIn:(isloggedin:boolean) => void;
-    setStoreId:(id:string) => void;
+    setStoreId:(store_id:string) => void;
+    setUserId:(user_id:string) => void;
+    getUserId:() => string | null;
 
   }
  
@@ -22,6 +25,7 @@ export interface CartContextType  {
 export const CartContext = createContext<CartContextType | null>({
   storeId: null,
   cartItems: null,
+  userId: null,
   addToCart: (item:Menu_item) => null,
   removeItem:(item_id:number) => null,
   updateQuantity:(item_id:number, ammount:number)=>null,
@@ -31,7 +35,9 @@ export const CartContext = createContext<CartContextType | null>({
   getCartTotal: () => 0,
   getIsLoggedIn:() => false,
   setIsLoggedIn:(isloggedin:boolean) => false,
-  setStoreId:(id:string) => null
+  setStoreId:(store_id:string) => null,
+  setUserId:(user_id:string) => null,
+  getUserId:() => null
 });
 
 interface CartProviderProps {
@@ -44,6 +50,8 @@ interface CartProviderProps {
   }) => {
     //const [storeId, setStoreId] = useLocalStorage('store_id', null);
     const [storeId, setStoreIdState] = useState<string | null>(null);
+    const [userId, setUserIdState] = useState<string | null>(null);
+
     const[cartItems, setCartItems] = useLocalStorage('cart_items', [] as Menu_item[]);
     const[isLoggedIn, setLoggedIn] = useLocalStorage('is_logged_in', false);
 
@@ -60,9 +68,17 @@ interface CartProviderProps {
   }, [cartItems, storeId]);
   
 
-  const setStoreId = (id: string) => {
-    setStoreIdState(id);
+  const setStoreId = (store_id: string) => {
+    setStoreIdState(store_id);
   };
+
+  const setUserId = (user_id:string) => {
+    setUserIdState(user_id);
+  }
+
+  const getUserId = () =>{
+    return userId;
+  }
 
     const isItemInCart = (searchId:number):boolean => {
       return cartItems.some(order => order.id === searchId);
@@ -159,6 +175,7 @@ interface CartProviderProps {
         value={{
           storeId,
           cartItems,
+          userId,
           addToCart,
           removeItem,
           updateQuantity,
@@ -168,7 +185,9 @@ interface CartProviderProps {
           getCartTotal,
           getIsLoggedIn,
           setIsLoggedIn,
-          setStoreId
+          setStoreId,
+          getUserId,
+          setUserId
         }}
       >
         {children}

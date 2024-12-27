@@ -12,6 +12,7 @@ interface FadeOutModalProps {
   showDuration?: number;
   /** How long (in ms) the fade-out transition should last. Default is 500ms. */
   fadeDuration?: number;
+  
 }
 
 const FadeOutModal: React.FC<FadeOutModalProps> = ({
@@ -19,7 +20,7 @@ const FadeOutModal: React.FC<FadeOutModalProps> = ({
   onClose,
   children,
   showDuration = 2000,
-  fadeDuration = 500,
+  fadeDuration = 500
 }) => {
   const [internalOpen, setInternalOpen] = useState(isOpen);
   const [isFadingOut, setIsFadingOut] = useState(false);

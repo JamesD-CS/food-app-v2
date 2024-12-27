@@ -1,24 +1,62 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useContext} from 'react';
+import { CartContext } from './cart_context';
 import { createPortal } from 'react-dom';
 import cookies from 'js-cookie';
 import { Address } from './app_types';
 import { AddressModal } from './address_modal';
+import NavBar from './nav_bar';
+import FadeOutModal from './FadeOutModal'; // <-- Import the FadeOutModal component
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
 interface APProps {
   div_id:string
   address:Address | null
-  
 }
 
 const ProfileComponent: React.FC = () => {
 
     const token = cookies.get('token');
     const user_name= cookies.get('user_name');
+    const user_id = cookies.get('id');
     const email= cookies.get('email');
     const [address, setAddress]= useState<Address[]>([]);
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+    const  cartContext = useContext(CartContext);
+    const [deleteMessage, setDeleteMessage] = useState('');
+
+    const getAddresses = () => {
+
+      const requestOptions = {
+        method: 'GET',
+        headers: { 
+            'Authorization': 'Bearer '+ token,
+            'Content-Type': 'application/json',
+            'Accept':'*/*'
+        },
+        
+      };
+      console.log("request options:", requestOptions.headers)
+      console.log('fetching items');
+      //fetch categories
+      fetch(apiUrl + '/addresses/', requestOptions).then((response) => {
+        if(!response.ok) throw new Error(response.status.toString() );
+        else return response.json();
+      })
+      .then((address_response) => {
+        console.log("Addresses:", address_response.addresses);
+        setAddress(address_response.addresses);
+      })
+      .catch((error) => {
+        console.log('error: ' + error);
+      });
+
+    }
     
+    const onFadeModalClose = () =>{
+      setIsModalOpen(false);
+      getAddresses();
+    }
 
     const AddressPortal:React.FC<APProps> = ({ div_id , address }) => {
    
@@ -64,43 +102,67 @@ const ProfileComponent: React.FC = () => {
 
     })
 
-    useEffect(() =>{
-        const requestOptions = {
-            method: 'GET',
-            headers: { 
-                'Authorization': 'Bearer '+ token,
-                'Content-Type': 'application/json',
-                'Accept':'*/*'
-            },
-            
-          };
-          console.log("request options:", requestOptions.headers)
-          console.log('fetching items');
-          //fetch categories
-          fetch(apiUrl + '/addresses/', requestOptions).then((response) => {
-            if(!response.ok) throw new Error(response.status.toString() );
-            else return response.json();
-          })
-          .then((address_response) => {
-            console.log("Addresses:", address_response.addresses);
-            setAddress(address_response.addresses);
-          })
-          .catch((error) => {
-            console.log('error: ' + error);
-          });
+    const deleteAddress = (async (event:React.MouseEvent<HTMLButtonElement>) =>{
+      console.log("target id is:", event.currentTarget.id)
+      let address_id = event.currentTarget.id;
 
+      const deleteAddRequestOptions = {
+        method: 'DELETE',
+        headers: { 
+          'Authorization': 'Bearer '+ token,
+          'Content-Type': 'application/json',
+          'Accept':'*/*'
+      },
+      }
+
+      let reqUrl = apiUrl + '/addresses/' + address_id;
+        
+        try{
+          const delete_response = await fetch(reqUrl, deleteAddRequestOptions);
+
+          if(delete_response.status == 204){
+            console.log("delete success")
+            setDeleteMessage( "Address Deleted");
+            setIsModalOpen(true);
+
+          }else{
+            console.log("error deleting")
+            setDeleteMessage( "Error Deleting Message");
+            setIsModalOpen(true);
+          }
+
+        }catch(error){
+          console.log(error);
+
+        }
+
+    })
+
+    useEffect(() =>{
+        getAddresses();
     }, [])
 
     return(
         <>
+        <NavBar />
+        <br />
         <div id = "address_modal_root">
-        Token:{token}
+        <FadeOutModal
+          isOpen={isModalOpen}
+          onClose={() => onFadeModalClose()}
+          showDuration={500}  // Wait (x)ms before starting fade
+          fadeDuration={200}   // 0.5s fade-out transition
+        >
+          <p>{deleteMessage}</p>
+      </FadeOutModal>
         <br />
         User name:{user_name}
         <br />
         email:{email}
         <br />
-        <h1>Coming soon</h1>
+        user_id:{user_id}
+        <br />
+        logged in?:{cartContext?.getIsLoggedIn().toString()}
         <br />
         <button onClick={clearCookie}>
           Clear Cookies
@@ -119,29 +181,33 @@ const ProfileComponent: React.FC = () => {
           <th >State</th>
           <th >Postal Code</th>
           <th >Country</th>
+          
         </tr>
       </thead>
       <tbody>
         
         {address?.map((address) => (
          
-          <tr key={address.id}>
+          <tr key={address.id} >
             <td >{address.id}</td>
             <td > {address.street}</td>
             <td >{address.city}</td>
             <td >{address.state}</td>
             <td >{address.postal_code}</td>
             <td >{address.country}</td>
-            <td id = {String(address.id)}> <AddressPortal address={address} div_id = {String(address.id)}  />
+            <td id = {String(address.id)} colSpan={6}> <AddressPortal address={address} div_id = {String(address.id)}  />
             </td>
+            <td><button id = {String(address.id)} onClick={deleteAddress}>Delete Address</button></td>
             
           </tr>
         ))}
+        <tr> 
+          <td colSpan={6} id = {"add_new_div"}>
+          <AddressPortal address={null} div_id = {"add_new_div"}  />
+          </td>
+        </tr>
       </tbody>
     </table>
-    <div id="add_new_div">
-    <AddressPortal address={null} div_id = {"add_new_div"}  />
-    </div>
 
     </div>
         </>

@@ -1,9 +1,11 @@
 import {useNavigate} from 'react-router'
 import './App.css'
 const apiUrl = import.meta.env.VITE_API_URL;
-import React, { useState, FormEvent } from 'react';
+import React, { useState, FormEvent, useContext } from 'react';
 import cookies from 'js-cookie';
 import FadeOutModal from './FadeOutModal'; // <-- Import the FadeOutModal component
+import { CartContext } from "./cart_context.tsx";
+
 
 interface FormData {
   email: string;
@@ -13,8 +15,8 @@ interface FormData {
 const LoginComponent: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const navigate = useNavigate();
-
-
+  const  cartContext = useContext(CartContext);
+  
   const [formData, setFormData] = useState<FormData>({
     email: '',
     password: '',
@@ -63,8 +65,8 @@ const LoginComponent: React.FC = () => {
       cookies.set('id', result.user.id, { expires: 2, secure: true });
       cookies.set('email', result.user.email, { expires: 2, secure: true });
       cookies.set('phone_number', result.user.phone_number, { expires: 2, secure: true });
-
-
+      cartContext?.setIsLoggedIn(true);
+      cartContext?.setUserId(result.user_id);
 
       // Optionally reset the form
       setFormData({email: '', password: '' });

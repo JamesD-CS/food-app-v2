@@ -20,9 +20,9 @@ ReactDOM.createRoot(root).render(
   <BrowserRouter>
     <Routes>
       <Route path="/" element={<App />} />,
-      <Route path="login" element ={<Login />} />,
+      <Route path="login" element ={<CartProvider><Login /></CartProvider>} />,
       <Route path="signup" element ={<Signup />} />,
-      <Route path="profile" element ={<Profile />} />
+      <Route path="profile" element ={<CartProvider><Profile /></CartProvider>} />
       <Route path="restaurants" element ={<Restaurants />} />
       <Route path="rest_details/" element ={<CartProvider> <RestDetails /> </CartProvider>} />
     </Routes>

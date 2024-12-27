@@ -3,6 +3,7 @@ import { useLocation } from 'react-router';
 import cookies from 'js-cookie';
 import { Category, Menu_item } from './app_types';
 import { CartContext } from "./cart_context.tsx";
+import NavBar from './nav_bar.tsx';
 import FadeOutModal from './FadeOutModal'; // <-- Import the FadeOutModal component
 
 
@@ -27,7 +28,6 @@ const RestDetails: React.FC = () => {
     const  cartContext = useContext(CartContext);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
-
 
     const MenuTable: React.FC<MenuTableProps> = ({ categories, menu_items }) => {
       // Group menu items by their category
@@ -134,7 +134,11 @@ const RestDetails: React.FC = () => {
     return(
       
         <>
+        <NavBar />
+        <br />
+
         <button type="button" onClick={() => showCart()}>Show Cart</button>
+        <br />
         <button type="button" onClick={() => clearCart()}>Clear Cart</button>
 
         <FadeOutModal
@@ -151,7 +155,8 @@ const RestDetails: React.FC = () => {
         Restaurant Id:{rest_id}
         </h2>
         Cart items: {cartContext?.getItemCount()}
-
+        <br />
+        Is logged in?: {cartContext?.getIsLoggedIn().toString()}
         <br />
 
         <MenuTable categories ={categories} menu_items={menu_items}/>

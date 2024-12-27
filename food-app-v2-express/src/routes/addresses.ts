@@ -195,7 +195,7 @@ router.put('/:address_id', async(req, res) =>{
 
 });
 
-/* Get user addresses */
+/* Delete user addresses */
 router.delete('/:address_id', async (req, res) => {
 
   let userdata = res.locals.userdata;

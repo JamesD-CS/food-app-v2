@@ -101,7 +101,7 @@ const AddressForm: React.FC<AFProps> = ({ address, div_id, onClose, onSubmit}) =
 
   return (
 
-    <div id={div_id}>   
+    <div id={div_id} text-align={"center"}>   
     <FadeOutModal
           isOpen={isModalOpen}
           onClose={() => onModalClose()}
