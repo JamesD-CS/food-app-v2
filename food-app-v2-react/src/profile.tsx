@@ -144,8 +144,6 @@ const ProfileComponent: React.FC = () => {
 
     return(
         <>
-        <NavBar />
-        <br />
         <div id = "address_modal_root">
         <FadeOutModal
           isOpen={isModalOpen}

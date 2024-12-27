@@ -134,9 +134,6 @@ const RestDetails: React.FC = () => {
     return(
       
         <>
-        <NavBar />
-        <br />
-
         <button type="button" onClick={() => showCart()}>Show Cart</button>
         <br />
         <button type="button" onClick={() => clearCart()}>Clear Cart</button>

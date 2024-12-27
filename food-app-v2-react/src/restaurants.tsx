@@ -89,7 +89,6 @@ const Restaurants:React.FC = () => {
 
     return(
       <>
-        <NavBar />
         <RestaurantTable restaurants={data} />
       </>
 

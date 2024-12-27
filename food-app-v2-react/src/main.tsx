@@ -8,6 +8,7 @@ import Profile from './profile.tsx'
 import Restaurants  from './restaurants.tsx';
 import RestDetails from './rest_details.tsx'
 import { CartProvider } from './cart_context.tsx';
+import NavBar from './nav_bar.tsx';
 
 const root = document.getElementById("root")!;
 
@@ -16,8 +17,8 @@ modalRoot.setAttribute('id', 'modal-root');
 document.body.appendChild(modalRoot);
 
 ReactDOM.createRoot(root).render(
-
   <BrowserRouter>
+    <NavBar />
     <Routes>
       <Route path="/" element={<App />} />,
       <Route path="login" element ={<CartProvider><Login /></CartProvider>} />,
