@@ -74,7 +74,7 @@ const RestDetails: React.FC = () => {
     const MenuTable: React.FC<MenuTableProps> = ({ categories, menu_items }) => {
       // Group menu items by their category
       const groupedItems = categories.map((category) => {
-        const items = menu_items.filter((item) => item.category.id === category.id);
+        const items = menu_items.filter((item) => item.category?.id === category.id);
         return { category, items };
       });
     

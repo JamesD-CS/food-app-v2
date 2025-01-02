@@ -58,6 +58,7 @@ export type Address = {
 }
 
 export type Order = {
+      id?:number
       user_id?: number
       restaurant_id?:number
       menu_items?:Menu_item[]

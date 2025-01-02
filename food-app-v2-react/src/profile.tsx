@@ -2,7 +2,7 @@ import React, {useEffect, useState, useContext} from 'react';
 import { CartContext } from './cart_context';
 import { createPortal } from 'react-dom';
 import cookies from 'js-cookie';
-import { Address } from './app_types';
+import { Address, Order } from './app_types';
 import { AddressModal } from './address_modal';
 import FadeOutModal from './FadeOutModal'; // <-- Import the FadeOutModal component
 
@@ -13,6 +13,46 @@ interface APProps {
   address:Address | null
 }
 
+interface orderTableProps {
+  orders:Order[]
+}
+
+const UserOrderTable: React.FC<orderTableProps> = ({ orders }) => {
+
+  if (!Array.isArray(orders)) {
+    return <div>No data available</div>;
+  }
+  
+  return (
+    <table style={{ borderCollapse: "collapse", width: "100%" }}>
+      <thead>
+        <tr>
+          <th colSpan={5}>
+            Your Orders
+          </th>
+        </tr>
+        <tr>
+          <th >Order ID</th>
+          <th >Order Status</th>
+          <th >Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {orders.map((order) => (
+         
+          <tr key={order.id}>
+            <td>{order.id}</td>
+            <td>{order.order_status}</td>
+            <td>{order.total_amount}</td>
+          </tr>
+          
+        ))}
+      </tbody>
+    </table>
+  );
+
+};
+
 const ProfileComponent: React.FC = () => {
 
     const token = cookies.get('token');
@@ -20,10 +60,11 @@ const ProfileComponent: React.FC = () => {
     const user_id = cookies.get('id');
     const email= cookies.get('email');
     const [address, setAddress]= useState<Address[]>([]);
+    const [orders, serOrders] = useState<Order[]>([]);
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const  cartContext = useContext(CartContext);
     const [deleteMessage, setDeleteMessage] = useState('');
-    let deliveryAddress: Address | null | undefined = cartContext?.getAddress();
+    const [selectedAddress, setSelectedAddress] = useState<Address>()
 
     const getAddresses = () => {
 
@@ -50,6 +91,34 @@ const ProfileComponent: React.FC = () => {
       .catch((error) => {
         console.log('error: ' + error);
       });
+
+    }
+
+    const getOrders = () => {
+      const fetchOrderUrl = apiUrl + '/orders';
+
+      const requestOptions = {
+        method: 'GET',
+        headers: { 
+            'Authorization': 'Bearer '+ token,
+            'Content-Type': 'application/json',
+            'Accept':'*/*'
+        }, 
+      };
+
+      fetch(fetchOrderUrl, requestOptions).then((response) => {
+        if(!response.ok) throw new Error(response.status.toString() );
+        else return response.json();
+      })
+      .then((get_order_response) => {
+        console.log("order:", get_order_response.orders);
+        serOrders(get_order_response.orders);
+      })
+      .catch((error) => {
+        console.log('error: ' + error);
+      });
+
+
 
     }
     
@@ -104,6 +173,7 @@ const ProfileComponent: React.FC = () => {
 
     const setDeliveryAddress = ( delivery_address:Address) =>{
       cartContext?.setAddress(delivery_address);
+      setSelectedAddress(delivery_address)
     }
 
     const deleteAddress = (async (event:React.MouseEvent<HTMLButtonElement>) =>{
@@ -144,6 +214,8 @@ const ProfileComponent: React.FC = () => {
 
     useEffect(() =>{
         getAddresses();
+        getOrders();
+        setDeliveryAddress(cartContext?.getAddress()!)
     }, [])
 
     return(
@@ -201,7 +273,7 @@ const ProfileComponent: React.FC = () => {
             <td id = {String(address.id)} colSpan={6}> <AddressPortal address={address} div_id = {String(address.id)}  />
             </td>
             <td><button id = {String(address.id)} onClick={deleteAddress}>Delete Address</button></td>
-            <td><button id = {String(address.id)+"-set_delivery"} onClick={() => setDeliveryAddress( address)}>{(deliveryAddress==address)?"Current Delivery Address":"Set Delivery Address"}</button></td>
+            <td><button id = {String(address.id)+"-set_delivery"} onClick={() => setDeliveryAddress( address)}>{(address==selectedAddress)?"Current Delivery Address":"Set Delivery Address"}</button></td>
 
             
           </tr>
@@ -213,8 +285,8 @@ const ProfileComponent: React.FC = () => {
         </tr>
       </tbody>
     </table>
-
     </div>
+    <UserOrderTable orders={orders}/>
         </>
     )
 
