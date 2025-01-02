@@ -3,7 +3,6 @@ import cookies from 'js-cookie';
 const apiUrl = import.meta.env.VITE_API_URL;
 import {Link} from 'react-router';
 import  { Restaurant } from './app_types';
-import NavBar from './nav_bar';
 
 interface RestaurantTableProps {
   restaurants: Restaurant[];

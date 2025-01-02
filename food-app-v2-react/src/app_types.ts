@@ -21,12 +21,12 @@ export type Category = {
 }
 
 export type Menu_item = {
-    id: number
-    name: string
-    description: string
-    price: number
-    is_available: boolean
-    category: Category
+    id?: number
+    name?: string
+    description?: string
+    price?: number
+    is_available?: boolean
+    category?: Category
     quantity?:number
 }
 
@@ -58,7 +58,6 @@ export type Address = {
 }
 
 export type Order = {
-      item_id: number
       user_id?: number
       restaurant_id?:number
       menu_items?:Menu_item[]
@@ -66,7 +65,5 @@ export type Order = {
       order_status?:string
       total_amount?:number
       payment_status?:string
-      item_name:string
-      quantity: number
-      price:number
+      
   }

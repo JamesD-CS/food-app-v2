@@ -4,7 +4,6 @@ import { createPortal } from 'react-dom';
 import cookies from 'js-cookie';
 import { Address } from './app_types';
 import { AddressModal } from './address_modal';
-import NavBar from './nav_bar';
 import FadeOutModal from './FadeOutModal'; // <-- Import the FadeOutModal component
 
 const apiUrl = import.meta.env.VITE_API_URL;
@@ -24,6 +23,7 @@ const ProfileComponent: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const  cartContext = useContext(CartContext);
     const [deleteMessage, setDeleteMessage] = useState('');
+    let deliveryAddress: Address | null | undefined = cartContext?.getAddress();
 
     const getAddresses = () => {
 
@@ -102,6 +102,10 @@ const ProfileComponent: React.FC = () => {
 
     })
 
+    const setDeliveryAddress = ( delivery_address:Address) =>{
+      cartContext?.setAddress(delivery_address);
+    }
+
     const deleteAddress = (async (event:React.MouseEvent<HTMLButtonElement>) =>{
       console.log("target id is:", event.currentTarget.id)
       let address_id = event.currentTarget.id;
@@ -162,6 +166,7 @@ const ProfileComponent: React.FC = () => {
         <br />
         logged in?:{cartContext?.getIsLoggedIn().toString()}
         <br />
+        Current Delivery Address:{String(cartContext?.getAddress()?.street)}
         <button onClick={clearCookie}>
           Clear Cookies
         </button>
@@ -196,6 +201,8 @@ const ProfileComponent: React.FC = () => {
             <td id = {String(address.id)} colSpan={6}> <AddressPortal address={address} div_id = {String(address.id)}  />
             </td>
             <td><button id = {String(address.id)} onClick={deleteAddress}>Delete Address</button></td>
+            <td><button id = {String(address.id)+"-set_delivery"} onClick={() => setDeliveryAddress( address)}>{(deliveryAddress==address)?"Current Delivery Address":"Set Delivery Address"}</button></td>
+
             
           </tr>
         ))}

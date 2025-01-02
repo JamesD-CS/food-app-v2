@@ -16,6 +16,8 @@ const LoginComponent: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const navigate = useNavigate();
   const  cartContext = useContext(CartContext);
+  const [modalMessage, setModalMessage] = useState("");
+  const [loginSuccess, setLoginSuccess] = useState(false);
   
   const [formData, setFormData] = useState<FormData>({
     email: '',
@@ -32,7 +34,9 @@ const LoginComponent: React.FC = () => {
 
   const onModalClose = () =>{
     setIsModalOpen(false)
+    if(loginSuccess){
     navigate('/profile', { replace: true });
+    }
   }
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -52,12 +56,16 @@ const LoginComponent: React.FC = () => {
       if (!response.ok) {
         // Handle non-2xx HTTP responses
         console.error('Server returned an error response');
+        setModalMessage("Error Signing In")
+        setIsModalOpen(true)
         return;
       }
 
       const result = await response.json();
 
       console.log('Form submitted successfully:', result);
+      setModalMessage("Login Successful")
+      setLoginSuccess(true)
       setIsModalOpen(true);
 
       cookies.set('token', result.token, { expires: 2, secure: true });
@@ -85,7 +93,7 @@ const LoginComponent: React.FC = () => {
           showDuration={500}  // Wait (x)ms before starting fade
           fadeDuration={200}   // 0.5s fade-out transition
         >
-          <p>Login Successful</p>
+          <p>{modalMessage}</p>
       </FadeOutModal>
 
     <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', width: '300px', gap: '10px' }}>

@@ -7,6 +7,7 @@ import Signup from './signup.tsx'
 import Profile from './profile.tsx'
 import Restaurants  from './restaurants.tsx';
 import RestDetails from './rest_details.tsx'
+import Checkout from './checkout.tsx';
 import { CartProvider } from './cart_context.tsx';
 import NavBar from './nav_bar.tsx';
 
@@ -26,6 +27,8 @@ ReactDOM.createRoot(root).render(
       <Route path="profile" element ={<CartProvider><Profile /></CartProvider>} />
       <Route path="restaurants" element ={<Restaurants />} />
       <Route path="rest_details/" element ={<CartProvider> <RestDetails /> </CartProvider>} />
+      <Route path="checkout/" element ={<CartProvider> <Checkout /> </CartProvider>} />
+
     </Routes>
   </BrowserRouter>
 

@@ -1,10 +1,12 @@
 import React, {useEffect, useState, useContext} from 'react';
+import { createPortal } from 'react-dom';
 import { useLocation } from 'react-router';
 import cookies from 'js-cookie';
 import { Category, Menu_item } from './app_types';
 import { CartContext } from "./cart_context.tsx";
-import NavBar from './nav_bar.tsx';
 import FadeOutModal from './FadeOutModal'; // <-- Import the FadeOutModal component
+import { CartViewModal } from './cart_modal.tsx';
+
 
 
 const apiUrl = import.meta.env.VITE_API_URL;
@@ -13,6 +15,46 @@ interface MenuTableProps {
     categories:Category[];
     menu_items:Menu_item[];
 }
+
+interface CartModalProps {
+  div_id:string
+}
+
+const onClose = () => {
+
+}
+
+const onSubmit = () => {
+
+}
+
+const CartPortal:React.FC<CartModalProps> = ({div_id }) => {
+   
+    const [showModal, setShowModal] = useState(false);
+    const modalClose = () => {
+      setShowModal(false)
+    };
+  
+    const onModalSubmit = () =>{
+      setShowModal(false)
+      window.location.reload();
+    }
+
+    let buttonText = ("Show Cart")
+    return (
+      <>
+        {!showModal &&
+        <button onClick={() => setShowModal(true)}>
+          {buttonText}
+        </button>
+        }
+        {showModal && createPortal(
+          <CartViewModal onClose={modalClose} onSubmit={onModalSubmit}  />,
+          document.getElementById(div_id)!
+        )}
+      </>
+    );
+  }
 
 const RestDetails: React.FC = () => {
     let restaurant_info = useLocation();
@@ -134,7 +176,9 @@ const RestDetails: React.FC = () => {
     return(
       
         <>
-        <button type="button" onClick={() => showCart()}>Show Cart</button>
+        <div id="rest_details_root">
+        <CartPortal div_id = {"rest_details_root"}  />
+
         <br />
         <button type="button" onClick={() => clearCart()}>Clear Cart</button>
 
@@ -157,6 +201,7 @@ const RestDetails: React.FC = () => {
         <br />
 
         <MenuTable categories ={categories} menu_items={menu_items}/>
+        </div>
         </>
 
     )
