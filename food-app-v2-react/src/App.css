@@ -35,6 +35,19 @@ ul{
   }
 }
 
+.page-content {
+  text-align: center;
+
+}
+
+.app-form {
+  display: 'flex'; 
+  align-items: center;
+  justify-content: center;
+  width: '300px';
+  gap: '10px';
+}
+
 .modal-overlay {
   position: fixed; 
   top: 0; 
@@ -63,6 +76,12 @@ ul{
   border-radius: 5px; 
   text-align: center;
   color: black;
+}
+
+.center {
+  margin: auto;
+  width: 50%;
+  padding: 10px;
 }
 
 .card-view {

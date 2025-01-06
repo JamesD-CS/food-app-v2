@@ -7,12 +7,10 @@ import cookies from 'js-cookie';
 
 interface AFProps  {
     address: Address | null
-    div_id:string
     onClose: () => void
-    onSubmit: () => void
 }
 
-const AddressForm: React.FC<AFProps> = ({ address, div_id, onClose, onSubmit}) => {
+const AddressForm: React.FC<AFProps> = ({ address, onClose}) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const token = cookies.get('token');
   const user_name= cookies.get('user_name');
@@ -52,7 +50,6 @@ const AddressForm: React.FC<AFProps> = ({ address, div_id, onClose, onSubmit}) =
 
   const onModalClose = () => {
     setIsModalOpen(false);
-    onSubmit();
 
   }
 
@@ -101,7 +98,7 @@ const AddressForm: React.FC<AFProps> = ({ address, div_id, onClose, onSubmit}) =
 
   return (
 
-    <div id={div_id} text-align={"center"}>   
+    <div text-align={"center"}>   
     <FadeOutModal
           isOpen={isModalOpen}
           onClose={() => onModalClose()}
@@ -179,8 +176,9 @@ const AddressForm: React.FC<AFProps> = ({ address, div_id, onClose, onSubmit}) =
       </div>
 
       <button type="submit">Submit</button>
+      <button onClick={onClose}>Close</button>
+
     </form>
-    <button onClick={onClose}>Close</button>
     </div>
   );
 };

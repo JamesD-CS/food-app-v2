@@ -20,6 +20,7 @@ document.body.appendChild(modalRoot);
 ReactDOM.createRoot(root).render(
   <BrowserRouter>
     <NavBar />
+    <br />
     <Routes>
       <Route path="/" element={<App />} />,
       <Route path="login" element ={<CartProvider><Login /></CartProvider>} />,
@@ -28,6 +29,7 @@ ReactDOM.createRoot(root).render(
       <Route path="restaurants" element ={<Restaurants />} />
       <Route path="rest_details/" element ={<CartProvider> <RestDetails /> </CartProvider>} />
       <Route path="checkout/" element ={<CartProvider> <Checkout /> </CartProvider>} />
+
 
     </Routes>
   </BrowserRouter>

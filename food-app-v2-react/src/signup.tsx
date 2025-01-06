@@ -85,7 +85,7 @@ const RegistrationForm: React.FC = () => {
           <p>Signup Successful</p>
       </FadeOutModal>
 
-    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', width: '300px', gap: '10px' }}>
+    <form onSubmit={handleSubmit} className="app-form">
 
       <div>
         <label htmlFor="name">Name</label><br />

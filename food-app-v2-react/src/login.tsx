@@ -95,8 +95,8 @@ const LoginComponent: React.FC = () => {
         >
           <p>{modalMessage}</p>
       </FadeOutModal>
-
-    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', width: '300px', gap: '10px' }}>
+    <div className="page-content" id="modal-root">
+    <form onSubmit={handleSubmit} className="app-form">
 
       <div>
         <label htmlFor="email">Email</label><br />
@@ -126,6 +126,7 @@ const LoginComponent: React.FC = () => {
 
       <button type="submit">Login</button>
     </form>
+    </div>
     </>
   );
 };
