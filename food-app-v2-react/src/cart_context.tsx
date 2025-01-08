@@ -1,6 +1,6 @@
 import { createContext, useEffect, useState } from 'react';
 import { useLocalStorage } from 'usehooks-ts';
-import { Item, Order, Menu_item, Address } from './app_types';
+import { Item, Order, Menu_item, Address, Restaurant } from './app_types';
 
 export interface CartContextType  {
     storeId: string | null;
@@ -8,6 +8,7 @@ export interface CartContextType  {
     userId:string | null;
     addressId: string | null;
     address : Address | null;
+    restaurants : Restaurant[] | null;
     addToCart: (item: Menu_item) => void;
     removeItem:(item_id:number)=> void;
     updateQuantity:(item_id:number, ammount:number)=>void;
@@ -25,6 +26,8 @@ export interface CartContextType  {
     getAddressId:() => string | null;
     setAddress:(address:Address) => void;
     getAddress:() => Address | null;
+    setRestaurants:(restaurants:Restaurant[]) => void;
+    getRestaurants:() => Restaurant[] | null;
 
   }
  
@@ -35,6 +38,7 @@ export const CartContext = createContext<CartContextType | null>({
   userId: null,
   addressId: null,
   address:null,
+  restaurants:null,
   addToCart: (item:Menu_item) => null,
   removeItem:(item_id:number) => null,
   updateQuantity:(item_id:number, ammount:number)=>null,
@@ -51,7 +55,9 @@ export const CartContext = createContext<CartContextType | null>({
   setAddressId:(address_id:string) => null,
   getAddressId:() => null,
   setAddress:(address:Address) => null,
-  getAddress:() => null
+  getAddress:() => null,
+  setRestaurants:(restaurants:Restaurant[]) => null,
+  getRestaurants:() => null
 });
 
 interface CartProviderProps {
@@ -67,6 +73,7 @@ interface CartProviderProps {
     const [userId, setUserIdState] = useState<string | null>(null);
     const [addressId, setAddressIdState] = useState<string | null>(null);
     const [address, setAddressState] = useLocalStorage('address', {} as Address);
+    const [restaurants, setRestaurantState] = useLocalStorage('restaurants', [] as Restaurant[]);
     const[cartItems, setCartItems] = useLocalStorage('cart_items', [] as Menu_item[]);
     const[isLoggedIn, setLoggedIn] = useLocalStorage('is_logged_in', false);
 
@@ -113,6 +120,14 @@ interface CartProviderProps {
 
     const getAddress = () =>{
       return address;
+    }
+
+    const setRestaurants = (restaurants:Restaurant[]) => {
+      setRestaurantState(restaurants);
+    }
+
+    const getRestaurants = () =>{
+      return restaurants;
     }
 
     const isItemInCart = (searchId:number):boolean => {
@@ -213,6 +228,7 @@ interface CartProviderProps {
           userId,
           address,
           addressId,
+          restaurants,
           addToCart,
           removeItem,
           updateQuantity,
@@ -229,7 +245,9 @@ interface CartProviderProps {
           setAddressId,
           getAddressId,
           setAddress,
-          getAddress
+          getAddress,
+          setRestaurants,
+          getRestaurants
 
         }}
       >

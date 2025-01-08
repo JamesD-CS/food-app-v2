@@ -11,10 +11,14 @@ const apiUrl = import.meta.env.VITE_API_URL;
 
 interface addressBookProps {
     addresses:Address[]
+    setCurrentAddress:(address:Address)=> void
+    currentAddress:Address
 }
 
 interface addressBookComponentProps{
   onClose:() => void
+  setDeliveryAddress:(delivery_address:Address) => void
+  currentAddress:Address|undefined
 }
 
 interface addAddressProps{
@@ -38,7 +42,11 @@ const AddAddressModal: React.FC<addAddressProps>  = ({div_id}) => {
   );
 }
 
-const AddressBookTable: React.FC<addressBookProps> = ({ addresses }) => {
+const AddressBookTable: React.FC<addressBookProps> = ({ addresses, setCurrentAddress, currentAddress }) => {
+
+  const setAddress =(new_address:Address) =>{
+    setCurrentAddress(new_address);
+  }
 
   if (!Array.isArray(addresses)) {
     return <div>No data available</div>;
@@ -67,6 +75,7 @@ const AddressBookTable: React.FC<addressBookProps> = ({ addresses }) => {
             <td>{address.street}</td>
             <td>{address.city}</td>
             <td>{address.state}</td>
+            <td>{(address.id==currentAddress.id)?"Current Address" : <button onClick={()=>setAddress(address)}>Set Address</button>}</td>
           </tr>
         </>
         ))}
@@ -76,15 +85,24 @@ const AddressBookTable: React.FC<addressBookProps> = ({ addresses }) => {
   );
 }
 
-export const AddressBookComponent: React.FC<addressBookComponentProps> = ({onClose}) => {
+export const AddressBookComponent: React.FC<addressBookComponentProps> = ({onClose, setDeliveryAddress, currentAddress}) => {
     const token = cookies.get('token');
     const user_name= cookies.get('user_name');
     const user_id = cookies.get('id');
     const email= cookies.get('email');
     const [addresses, setAddresses]= useState<Address[]>([]);
+    //const [currentAddress, setCurrentAddress] = useState<Address>();
     const  cartContext = useContext(CartContext);
     
-    let current_address = cartContext?.getAddress();
+    //let current_address = cartContext?.getAddress();
+    let current_address = currentAddress;
+
+    const setCurrentAddressState = (newCurrentAddress:Address) => {
+
+      //setCurrentAddress(newCurrentAddress)
+      setDeliveryAddress(newCurrentAddress)
+
+    }
 
     const getAddresses = () => {
 
@@ -141,7 +159,7 @@ export const AddressBookComponent: React.FC<addressBookComponentProps> = ({onClo
 
     useEffect(() =>{
         getAddresses();
-        }, [])
+        }, [currentAddress])
 
     if(!token){
         return(<p>You are not Logged in</p>)
@@ -151,7 +169,7 @@ export const AddressBookComponent: React.FC<addressBookComponentProps> = ({onClo
     <AddressTable delivery_address={current_address}></AddressTable>
     <br />
 
-    <AddressBookTable addresses={addresses} />
+    <AddressBookTable addresses={addresses} setCurrentAddress={setCurrentAddressState} currentAddress={current_address!} />
 
     <button onClick={onClose}>Close</button>
     <div id="address_form_div">

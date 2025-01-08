@@ -10,10 +10,11 @@ interface AdModalProps {
      /** Callback to run when the modal has fully closed (after fade-out). */
      address:Address | null;
      onClose:() => void;
+     setDeliveryAddress:(delivery_address:Address) => void;
     
 }
 
-export const AddressModal: React.FC<AdModalProps> = ({ isOpen, address, onClose  })  =>{
+export const AddressModal: React.FC<AdModalProps> = ({ isOpen, address, onClose, setDeliveryAddress  })  =>{
   const [internalOpen, setInternalOpen] = useState(isOpen);
 
 
@@ -42,7 +43,7 @@ export const AddressModal: React.FC<AdModalProps> = ({ isOpen, address, onClose 
           className="modal-content"
           
         >
-        <AddressBookComponent onClose={onClose}/>
+        <AddressBookComponent onClose={onClose} setDeliveryAddress={setDeliveryAddress} currentAddress={address!}/>
 
         </div>
       </div>,

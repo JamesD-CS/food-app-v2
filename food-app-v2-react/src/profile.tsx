@@ -1,11 +1,10 @@
 import React, {useEffect, useState, useContext} from 'react';
 import { CartContext } from './cart_context';
-import { createPortal } from 'react-dom';
 import cookies from 'js-cookie';
-import { Address, Order } from './app_types';
+import { Address, Order, Restaurant } from './app_types';
 import { AddressModal } from './address_modal';
 import FadeOutModal from './FadeOutModal'; // <-- Import the FadeOutModal component
-import { useNavigate } from 'react-router';
+import { getRestData } from './restaurants';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -15,6 +14,7 @@ interface addressTableProps {
 
 interface orderTableProps {
   orders:Order[]
+  rest_data:Restaurant[] | undefined | null
 }
 
 export const AddressTable: React.FC<addressTableProps> = ({delivery_address}) => {
@@ -53,11 +53,20 @@ export const AddressTable: React.FC<addressTableProps> = ({delivery_address}) =>
 };
 
 
-const UserOrderTable: React.FC<orderTableProps> = ({ orders }) => {
+const UserOrderTable: React.FC<orderTableProps> = ({ orders, rest_data }) => {
 
-  if (!Array.isArray(orders)) {
+  if (!Array.isArray(orders) || !rest_data) {
     return <div>No data available</div>;
   }
+  
+  const restnameMap = new Map(rest_data.map(rest => [rest.id, rest.name]));
+
+  const namedOrders = orders.map(order => ({
+    ...order,
+    name: restnameMap.get(order.restaurant_id!)
+  }));
+
+  console.log("rest names", namedOrders)
   
   return (
     <table style={{ borderCollapse: "collapse", width: "100%" }}>
@@ -69,15 +78,17 @@ const UserOrderTable: React.FC<orderTableProps> = ({ orders }) => {
         </tr>
         <tr key="order_header">
           <th >Order ID</th>
+          <th>Restaurant</th>
           <th >Order Status</th>
           <th >Total</th>
         </tr>
       </thead>
       <tbody>
-        {orders.map((order) => (
+        {namedOrders.map((order) => (
          <>
           <tr key={order.id}>
             <td>{order.id}</td>
+            <td>{order.name}</td>
             <td>{order.order_status}</td>
             <td>{order.total_amount}</td>
           </tr>
@@ -97,9 +108,11 @@ const ProfileComponent: React.FC = () => {
     const email= cookies.get('email');
     const [orders, serOrders] = useState<Order[]>([]);
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+    const [restData, setRestData] = useState<Restaurant[]>([])
+    const [deliveryAddress, setDeliveryAddressState] = useState<Address>();
     const  cartContext = useContext(CartContext);
-    const navigate = useNavigate();
-   
+
+    //let rest_data = cartContext?.getRestaurants()!;
 
     const getOrders = () => {
       const fetchOrderUrl = apiUrl + '/orders';
@@ -151,6 +164,7 @@ const ProfileComponent: React.FC = () => {
 
     const setDeliveryAddress = ( delivery_address:Address) =>{
       cartContext?.setAddress(delivery_address);
+      setDeliveryAddressState(delivery_address);
     }
 
     const getDeliveryAddress = () => {
@@ -161,6 +175,24 @@ const ProfileComponent: React.FC = () => {
     useEffect(() =>{
         getOrders();
         setDeliveryAddress(cartContext?.getAddress()!)
+        console.log("rest data is:", restData)
+        if(restData.length == 0){
+          console.log("Restaurant data not in local storage, fetching data from api")
+          const fetchRestaurants = async () => {
+                    try {
+                      // Call your fetch function
+                      const restData = await getRestData();
+                      setRestData(restData);
+                      cartContext?.setRestaurants(restData)
+                      console.log("rest data after fetch:", restData)
+
+                    } catch (err) {
+                      console.error('Failed to fetch restaurants:', err);
+                    }
+                  };
+            fetchRestaurants();
+        }
+
     }, [])
 
     return(
@@ -169,7 +201,8 @@ const ProfileComponent: React.FC = () => {
         <AddressModal
           isOpen={isModalOpen}
           onClose={closeModal}
-          address={null}
+          address={deliveryAddress!}
+          setDeliveryAddress={setDeliveryAddress}
         >
       </AddressModal>
         <br />
@@ -181,7 +214,7 @@ const ProfileComponent: React.FC = () => {
         <br />
         logged in?:{cartContext?.getIsLoggedIn().toString()}
         <br />
-        <AddressTable delivery_address={cartContext?.getAddress()}></AddressTable>
+        <AddressTable delivery_address={deliveryAddress}></AddressTable>
         <button onClick={() =>{setIsModalOpen(true)}}>Change</button>
 
         <br />
@@ -191,7 +224,7 @@ const ProfileComponent: React.FC = () => {
         <br />
         
     </div>
-    <UserOrderTable orders={orders}/>
+    <UserOrderTable orders={orders} rest_data={restData}/>
         </>
     )
 

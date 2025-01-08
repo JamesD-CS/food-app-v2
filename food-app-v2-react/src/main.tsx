@@ -26,7 +26,7 @@ ReactDOM.createRoot(root).render(
       <Route path="login" element ={<CartProvider><Login /></CartProvider>} />,
       <Route path="signup" element ={<Signup />} />,
       <Route path="profile" element ={<CartProvider><Profile /></CartProvider>} />
-      <Route path="restaurants" element ={<Restaurants />} />
+      <Route path="restaurants" element ={<CartProvider><Restaurants /> </CartProvider>} />
       <Route path="rest_details/" element ={<CartProvider> <RestDetails /> </CartProvider>} />
       <Route path="checkout/" element ={<CartProvider> <Checkout /> </CartProvider>} />
 
