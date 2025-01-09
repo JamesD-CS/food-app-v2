@@ -91,6 +91,7 @@ const Checkout: React.FC = ({}) => {
         .then((order_response) => {
           console.log("Order response:", order_response);
           placeOrderSucess(true)
+          cartContext?.clearCart();
           
         })
         .catch((error) => {
@@ -173,7 +174,7 @@ const Checkout: React.FC = ({}) => {
                 </table>
         <button onClick={()=>navigate('/profile', { replace: true })
 }>Close</button>
-        <button onClick={checkout}>Checkout</button>
+        <button onClick={checkout}>Place Order</button>
 
 
         </>
