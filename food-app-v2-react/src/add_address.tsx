@@ -50,7 +50,8 @@ const AddressForm: React.FC<AFProps> = ({ address, onClose}) => {
 
   const onModalClose = () => {
     setIsModalOpen(false);
-
+     //close add new address modal after submit
+     onClose();
   }
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -88,6 +89,7 @@ const AddressForm: React.FC<AFProps> = ({ address, onClose}) => {
         state: '',
         country: '',
         postal_code: ''});
+       
       
     } catch (error) {
       console.error('Error submitting form:', error);
@@ -175,7 +177,7 @@ const AddressForm: React.FC<AFProps> = ({ address, onClose}) => {
         />
       </div>
 
-      <button type="submit">Submit</button>
+      <button type="submit">Submit New Address</button>
       <button onClick={onClose}>Close</button>
 
     </form>

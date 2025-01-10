@@ -1,10 +1,9 @@
 import React, {useEffect, useState, useContext} from 'react';
 import { CartContext } from './cart_context';
-import { createPortal } from 'react-dom';
 import cookies from 'js-cookie';
 import { Address, Order } from './app_types';
 import FadeOutModal from './FadeOutModal'; // <-- Import the FadeOutModal component
-import AddressForm from './add_address';
+import { NewAddressModal } from './new_address_modal';
 import { AddressTable } from './profile';
 
 const apiUrl = import.meta.env.VITE_API_URL;
@@ -19,27 +18,6 @@ interface addressBookComponentProps{
   onClose:() => void
   setDeliveryAddress:(delivery_address:Address) => void
   currentAddress:Address|undefined
-}
-
-interface addAddressProps{
-  div_id:string 
-}
-
-const AddAddressModal: React.FC<addAddressProps>  = ({div_id}) => {
-  const [showModal, setShowModal] = useState(false);
-  return (
-    <>
-      {!showModal &&
-      <button onClick={() => setShowModal(true)}>
-        Add New Address
-      </button>
-      }
-      {showModal && createPortal(
-        <AddressForm onClose={() => setShowModal(false)} address={null} />,
-        document.getElementById(div_id) as HTMLElement
-      )}
-    </>
-  );
 }
 
 const AddressBookTable: React.FC<addressBookProps> = ({ addresses, setCurrentAddress, currentAddress }) => {
@@ -91,6 +69,8 @@ export const AddressBookComponent: React.FC<addressBookComponentProps> = ({onClo
     const user_id = cookies.get('id');
     const email= cookies.get('email');
     const [addresses, setAddresses]= useState<Address[]>([]);
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+    
     //const [currentAddress, setCurrentAddress] = useState<Address>();
     const  cartContext = useContext(CartContext);
     
@@ -102,6 +82,15 @@ export const AddressBookComponent: React.FC<addressBookComponentProps> = ({onClo
       //setCurrentAddress(newCurrentAddress)
       setDeliveryAddress(newCurrentAddress)
 
+    }
+
+    const closeNewAddressModal = () => {
+      setIsModalOpen(false)
+      getAddresses();
+    }
+
+    const showNewAddressModal = () => {
+      setIsModalOpen(true)
     }
 
     const getAddresses = () => {
@@ -173,7 +162,8 @@ export const AddressBookComponent: React.FC<addressBookComponentProps> = ({onClo
 
     <button onClick={onClose}>Close</button>
     <div id="address_form_div">
-    <AddAddressModal div_id={"address_form_div"}/>
+    <button onClick={showNewAddressModal}>Add New Address</button>
+    <NewAddressModal isOpen={isModalOpen} onClose={closeNewAddressModal} address={null}/>
     </div>
     </>)
 
