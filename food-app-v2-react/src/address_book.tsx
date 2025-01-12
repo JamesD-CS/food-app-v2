@@ -12,6 +12,7 @@ interface addressBookProps {
     addresses:Address[]
     setCurrentAddress:(address:Address)=> void
     currentAddress:Address
+    deleteFunction:(addressId:number) => void
 }
 
 interface addressBookComponentProps{
@@ -20,7 +21,7 @@ interface addressBookComponentProps{
   currentAddress:Address|undefined
 }
 
-const AddressBookTable: React.FC<addressBookProps> = ({ addresses, setCurrentAddress, currentAddress }) => {
+const AddressBookTable: React.FC<addressBookProps> = ({ addresses, setCurrentAddress, currentAddress, deleteFunction }) => {
 
   const setAddress =(new_address:Address) =>{
     setCurrentAddress(new_address);
@@ -42,18 +43,19 @@ const AddressBookTable: React.FC<addressBookProps> = ({ addresses, setCurrentAdd
           <th >Street</th>
           <th >City</th>
           <th >State</th>
-
+          <th></th>
         </tr>
       </thead>
       <tbody>
       
       {addresses.map((address) => (
          <>
-          <tr key={address.id}>
+          <tr key={address.id} className={(address.id==currentAddress.id)?"highlight":""}>
             <td>{address.street}</td>
             <td>{address.city}</td>
             <td>{address.state}</td>
             <td>{(address.id==currentAddress.id)?"Current Address" : <button onClick={()=>setAddress(address)}>Set Address</button>}</td>
+            <td>{(address.id!=currentAddress.id)?<button onClick={()=>deleteFunction(address.id!)}>Delete</button> : ""}</td>
           </tr>
         </>
         ))}
@@ -70,6 +72,9 @@ export const AddressBookComponent: React.FC<addressBookComponentProps> = ({onClo
     const email= cookies.get('email');
     const [addresses, setAddresses]= useState<Address[]>([]);
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+    const [isMessageModalOpen, setIsMessageModalOpen] = useState<boolean>(false);
+    const [messageDeleteSuccess, setMessageDeleteSuccess] = useState<boolean>();
+
     
     //const [currentAddress, setCurrentAddress] = useState<Address>();
     const  cartContext = useContext(CartContext);
@@ -81,6 +86,12 @@ export const AddressBookComponent: React.FC<addressBookComponentProps> = ({onClo
 
       //setCurrentAddress(newCurrentAddress)
       setDeliveryAddress(newCurrentAddress)
+
+    }
+
+    const onMessageModalClose = () =>{
+      setIsMessageModalOpen(false)
+      getAddresses();
 
     }
 
@@ -121,9 +132,8 @@ export const AddressBookComponent: React.FC<addressBookComponentProps> = ({onClo
   
       }
 
-    const deleteAddress = (async (event:React.MouseEvent<HTMLButtonElement>) =>{
-          console.log("target id is:", event.currentTarget.id)
-          let address_id = event.currentTarget.id;
+    const deleteAddress = (async (addressId:Number) =>{
+          console.log("address id is:", addressId)
     
           const deleteAddRequestOptions = {
             method: 'DELETE',
@@ -133,16 +143,20 @@ export const AddressBookComponent: React.FC<addressBookComponentProps> = ({onClo
               'Accept':'*/*'
           },
           }
-          let reqUrl = apiUrl + '/addresses/' + address_id;     
+          let reqUrl = apiUrl + '/addresses/' + addressId;     
             try{
               const delete_response = await fetch(reqUrl, deleteAddRequestOptions);
               if(delete_response.status == 204){
                 console.log("delete success")
+                setMessageDeleteSuccess(true)
               }else{
+                setMessageDeleteSuccess(false)
                 console.log("error deleting")
               }
             }catch(error){
               console.log(error);
+            }finally{
+              setIsMessageModalOpen(true)
             }
         })
 
@@ -155,10 +169,19 @@ export const AddressBookComponent: React.FC<addressBookComponentProps> = ({onClo
     }
 
     return(<>
+    <FadeOutModal
+          isOpen={isMessageModalOpen}
+          onClose={() => onMessageModalClose()}
+          showDuration={500}  // Wait (x)ms before starting fade
+          fadeDuration={200}   // 0.5s fade-out transition
+        >
+          <p>{(messageDeleteSuccess)?"Address Deleted":"Error Deleting Address"}</p>
+      </FadeOutModal>
     <AddressTable delivery_address={current_address}></AddressTable>
     <br />
 
-    <AddressBookTable addresses={addresses} setCurrentAddress={setCurrentAddressState} currentAddress={current_address!} />
+    <AddressBookTable addresses={addresses} setCurrentAddress={setCurrentAddressState} currentAddress={current_address!} 
+    deleteFunction={deleteAddress} />
 
     <button onClick={onClose}>Close</button>
     <div id="address_form_div">
