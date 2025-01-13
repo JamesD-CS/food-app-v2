@@ -64,40 +64,25 @@ const CartView: React.FC<CartViewProps> = ({onClose}) => {
 
     return(
         <>
-         <table className="modal-content">
-                  <thead>
-                    <tr>
-                        <th colSpan={4}> Cart </th>
-                    </tr>
-                    <tr>
-                      {/* Example header row. Adjust columns as needed */}
-                      <th style={{ textAlign: "left" }}>Name</th>
-                      <th style={{ textAlign: "left" }}>Description</th>
-                      <th style={{ textAlign: "left" }}>Price</th>
-                      <th style={{ textAlign: "left" }}>Available</th>
-                      <th style={{ textAlign: "left" }}>Quantity</th>
-
-                    </tr>
-                  </thead>
-                  <tbody>
-                        {menu_items.map((item) => (
-                          <tr key={item.id}>
-                            <td>{item.name}</td>
-                            <td>{item.description}</td>
-                            <td>{item.price}</td>
-                            <td>{item.is_available ? "Yes" : "No"}</td>
-                            <td>{item.quantity}</td>
-                            <td><button onClick={()=>increaseQuantity(item.id!)}>+</button> <button onClick={()=>decreaseQuantity(item.id!)}>-</button></td>
-                            <td><button onClick={() => removeItems(item.id!)}>Remove</button></td>
-                          </tr>
-                        ))}
-                        <tr>
-                          <td colSpan={8}> <button onClick={onClose}>Close</button>
-                          <button onClick={checkoutClick}>Checkout</button></td>
-                        </tr>
-                  </tbody>
-                </table>
-       
+         <div className="cart-items-grid">
+            {menu_items.map(item => (
+              <div key={item.id} className="cart-item-card">
+                <div className="cart-item-header">{item.name}</div>
+                <div className="cart-item-details">Price: {item.price}</div>
+                <div className="cart-item-details">Available: {item.is_available ? 'Yes' : 'No'}</div>
+                <div className="cart-item-details">
+                  <div className="quantity-div">
+                  <button onClick={() => increaseQuantity(item.id!)}>+</button>
+                  <span>{item.quantity}</span>
+                  <button onClick={()  => decreaseQuantity(item.id!)}>-</button>
+                  <button onClick={() => removeItems(item.id!)}>Remove</button>
+                  </div>
+                </div>
+              </div>
+            ))}
+         </div>
+         <button onClick={onClose}>Close</button>
+         <button onClick={checkoutClick}>Checkout</button>
         </>
     )
 

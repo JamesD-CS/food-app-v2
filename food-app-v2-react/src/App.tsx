@@ -1,4 +1,3 @@
-import NavBar from './nav_bar';
 import './App.css'
 
 function App() {

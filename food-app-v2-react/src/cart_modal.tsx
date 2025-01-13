@@ -23,7 +23,7 @@ export const CartViewModal: React.FC<CartModalProps> = ({onClose, isOpen})  =>{
         }, [isOpen]);
       
     
-      const modalRoot = document.getElementById('modal-root');
+      const modalRoot = document.getElementById('cart-modal-root');
         if (!modalRoot) return null;
       
         // If the modal is not open internally, render nothing.
@@ -31,13 +31,9 @@ export const CartViewModal: React.FC<CartModalProps> = ({onClose, isOpen})  =>{
       
         return ReactDOM.createPortal(
           <div
-            className={`modal-overlay `}>
-            <div
-              className="modal-content"
-              
-            >
-            <CartView onClose={onClose} />
-    
+            className={"drawer-right"}>
+            <div className={"drawer-content"}>
+              <CartView onClose={onClose} />
             </div>
           </div>,
           modalRoot

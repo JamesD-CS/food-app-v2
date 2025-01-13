@@ -143,7 +143,6 @@ const RestDetails: React.FC = () => {
     return(
       
         <>
-        <div id="rest_details_root">
          <CartViewModal
                   isOpen={isCartModalOpen}
                   onClose={closeCartModal}
@@ -174,7 +173,6 @@ const RestDetails: React.FC = () => {
         <br />
 
         <MenuTable categories ={categories} menu_items={menu_items}/>
-        </div>
         </>
 
     )

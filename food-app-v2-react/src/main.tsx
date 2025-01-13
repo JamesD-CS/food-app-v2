@@ -17,6 +17,10 @@ const modalRoot = document.createElement('div');
 modalRoot.setAttribute('id', 'modal-root');
 document.body.appendChild(modalRoot);
 
+const cartmodalRoot = document.createElement('div');
+modalRoot.setAttribute('id', 'cart-modal-root');
+document.body.appendChild(cartmodalRoot);
+
 ReactDOM.createRoot(root).render(
   <BrowserRouter>
     <NavBar />
