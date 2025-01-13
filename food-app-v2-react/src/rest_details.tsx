@@ -16,45 +16,7 @@ interface MenuTableProps {
     menu_items:Menu_item[];
 }
 
-interface CartModalProps {
-  div_id:string
-}
 
-const onClose = () => {
-
-}
-
-const onSubmit = () => {
-
-}
-
-const CartPortal:React.FC<CartModalProps> = ({div_id }) => {
-   
-    const [showModal, setShowModal] = useState(false);
-    const modalClose = () => {
-      setShowModal(false)
-    };
-  
-    const onModalSubmit = () =>{
-      setShowModal(false)
-      window.location.reload();
-    }
-
-    let buttonText = ("Show Cart")
-    return (
-      <>
-        {!showModal &&
-        <button onClick={() => setShowModal(true)}>
-          {buttonText}
-        </button>
-        }
-        {showModal && createPortal(
-          <CartViewModal onClose={modalClose} onSubmit={onModalSubmit}  />,
-          document.getElementById(div_id)!
-        )}
-      </>
-    );
-  }
 
 const RestDetails: React.FC = () => {
     let restaurant_info = useLocation();
@@ -70,6 +32,8 @@ const RestDetails: React.FC = () => {
     const  cartContext = useContext(CartContext);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isCartModalOpen, setIsCartModalOpen] = useState<boolean>(false);
+    
 
     const MenuTable: React.FC<MenuTableProps> = ({ categories, menu_items }) => {
       // Group menu items by their category
@@ -122,13 +86,16 @@ const RestDetails: React.FC = () => {
     
     };
     
-    const showCart = () => {
-      console.log("cart item count",cartContext?.getItemCount())
-      console.log(cartContext?.getCartItems())
-    };
-
     const clearCart = () => {
       cartContext?.clearCart();
+    }
+
+    const closeModal = () => {
+      setIsModalOpen(false)
+    }
+
+    const closeCartModal = () =>{
+      setIsCartModalOpen(false)
     }
 
 
@@ -177,9 +144,15 @@ const RestDetails: React.FC = () => {
       
         <>
         <div id="rest_details_root">
-        <CartPortal div_id = {"rest_details_root"}  />
+         <CartViewModal
+                  isOpen={isCartModalOpen}
+                  onClose={closeCartModal}
+                  
+                >
+              </CartViewModal>
 
         <br />
+        <button onClick={() =>{setIsCartModalOpen(true)}}>Show Cart </button>
         <button type="button" onClick={() => clearCart()}>Clear Cart</button>
 
         <FadeOutModal

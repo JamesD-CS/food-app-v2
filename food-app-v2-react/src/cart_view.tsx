@@ -10,10 +10,9 @@ const apiUrl = import.meta.env.VITE_API_URL;
 
 interface CartViewProps {
     onClose: () => void
-    onSubmit: () => void
 }
 
-const CartView: React.FC<CartViewProps> = ({onClose, onSubmit}) => {
+const CartView: React.FC<CartViewProps> = ({onClose}) => {
 
     const token = cookies.get('token');
     const user_name= cookies.get('user_name');
@@ -24,15 +23,43 @@ const CartView: React.FC<CartViewProps> = ({onClose, onSubmit}) => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        let items = cartContext?.getCartItems
-
-        setMenuItems(items!);
+      const items = cartContext?.getCartItems;
+      setMenuItems(items ?? []);
         
-    })
+    }, [cartContext])
 
     const checkoutClick = ()=>{
       navigate('/checkout', { replace: true });
 
+    }
+
+    const increaseQuantity = (itemId:number) =>{
+      let updated_quantity = cartContext?.updateQuantity(itemId, 1)
+      console.log("updated quantity of itemid", itemId, " is", updated_quantity)
+    }
+
+    const decreaseQuantity = (itemId:number) => {
+      let updated_quantity = cartContext?.updateQuantity(itemId, -1)
+      console.log("updated quantity of itemid", itemId, " is", updated_quantity)
+      if (updated_quantity! <= 0){
+        cartContext?.removeItem(itemId);
+      }
+      
+    }
+
+    const removeItems = (itemId:number) => {
+      cartContext?.removeItem(itemId);
+    }
+
+    if(cartContext?.getItemCount()==0){
+      return(
+        <>
+        <div className="modal-content">
+          <h2>Your Cart is Empty</h2>
+          <button onClick={onClose}>Close</button>
+        </div>
+        </>
+      )
     }
 
     return(
@@ -60,15 +87,17 @@ const CartView: React.FC<CartViewProps> = ({onClose, onSubmit}) => {
                             <td>{item.price}</td>
                             <td>{item.is_available ? "Yes" : "No"}</td>
                             <td>{item.quantity}</td>
-
+                            <td><button onClick={()=>increaseQuantity(item.id!)}>+</button> <button onClick={()=>decreaseQuantity(item.id!)}>-</button></td>
+                            <td><button onClick={() => removeItems(item.id!)}>Remove</button></td>
                           </tr>
                         ))}
+                        <tr>
+                          <td colSpan={8}> <button onClick={onClose}>Close</button>
+                          <button onClick={checkoutClick}>Checkout</button></td>
+                        </tr>
                   </tbody>
                 </table>
-        <button onClick={onClose}>Close</button>
-        <button onClick={checkoutClick}>Checkout</button>
-
-
+       
         </>
     )
 

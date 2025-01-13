@@ -11,7 +11,8 @@ export interface CartContextType  {
     restaurants : Restaurant[] | null;
     addToCart: (item: Menu_item) => void;
     removeItem:(item_id:number)=> void;
-    updateQuantity:(item_id:number, ammount:number)=>void;
+    updateQuantity:(item_id:number, ammount:number)=>number;
+    getQuantity:(item_id:number) =>number | undefined;
     clearCart:() => void;
     getItemCount:() => number;
     getCartItems:() => Menu_item[];
@@ -41,7 +42,8 @@ export const CartContext = createContext<CartContextType | null>({
   restaurants:null,
   addToCart: (item:Menu_item) => null,
   removeItem:(item_id:number) => null,
-  updateQuantity:(item_id:number, ammount:number)=>null,
+  updateQuantity:(item_id:number, ammount:number)=>0,
+  getQuantity:(item_id:number) =>0,
   clearCart:() => null,
   getItemCount:() => 0,
   getCartItems:  () => [],
@@ -167,25 +169,41 @@ interface CartProviderProps {
       }
     };
 
-    const updateQuantity=(item_id:number, ammount:number) => {
-      console.log('in cartcontext update quantity');
+    const updateQuantity=(item_id:number, ammount:number):number => {
+      console.log('in cartcontext update quantity item quantity before update is:', getQuantity(item_id));
+
       let change:number= 0;
       if (ammount > 0){
         change = 1;
       }else if (ammount < 0){
         change = -1;
       }
-      if (isItemInCart(item_id)) {
-        setCartItems(
-          cartItems.map((cartItem) =>
-            cartItem.id === item_id
-              ? { ...cartItem, quantity: cartItem.quantity! + change }
-              : cartItem
-          )
-        );
+      const updatedCartItems = cartItems.map((cartItem) =>
+        cartItem.id === item_id
+          ? { ...cartItem, quantity: cartItem.quantity! + change }
+          : cartItem
+      );
+    
+      // find the updated item in the new array
+      const updatedItem = updatedCartItems.find((cartItem) => cartItem.id === item_id);
 
-      }
+      setCartItems(updatedCartItems);
+      console.log(
+        'in cartcontext update quantity item quantity after update is:',
+        updatedItem?.quantity
+      );
+
+      return updatedItem?.quantity ?? 0;
+      
     };
+
+    const getQuantity=(item_id:number):number | undefined=> {
+      if(isItemInCart(item_id)){
+        let items = getCartItems()
+        let search_item=items.find(item => item.id === item_id);
+        return search_item?.quantity!
+      }
+    }
   
     const clearCart = () => {
       let cartItems = [] as Menu_item[];
@@ -232,6 +250,7 @@ interface CartProviderProps {
           addToCart,
           removeItem,
           updateQuantity,
+          getQuantity,
           clearCart,
           getItemCount,
           getCartItems,
