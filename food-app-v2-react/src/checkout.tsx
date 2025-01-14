@@ -126,52 +126,25 @@ const Checkout: React.FC = ({}) => {
         >
           <p>{modalMessage}</p>
       </FadeOutModal>
-         <table className="modal-content">
-                  <thead>
-                    <tr>
-                        <th colSpan={4}> Cart </th>
-                    </tr>
-                    <tr>
-                      {/* Example header row. Adjust columns as needed */}
-                      <th style={{ textAlign: "left" }}>Item</th>
-                      <th style={{ textAlign: "left" }}>Description</th>
-                      <th style={{ textAlign: "left" }}>Price</th>
-                      <th style={{ textAlign: "left" }}>Available</th>
-                      <th style={{ textAlign: "left" }}>Quantity</th>
-                      <th style={{ textAlign: "left" }}>Subtotal</th>
+      <div className="checkout-items-grid">
+            {menu_items.map(item => (
+              <div key={item.id} className="checkout-item-card">
+                <div className="checkout-item-header">{item.name}</div>
+                <div className="checkout-item-details">Price: ${item.price}</div>
+                <div className="checkout-item-details">
+                <span className="quantity-display">Quantity: {item.quantity}</span>
 
+                </div>
+              </div>
+            ))}
+         </div>
+         <br></br>
+         <div  className="checkout-item-card">
+         <div className="checkout-item-details" style={{color:"black", background:"light-gray"}}>Total: ${cartContext?.getCartTotal()}</div>
 
-                    </tr>
-                  </thead>
-                  <tbody>
-                        {menu_items.map((item) => (
-                          <tr key={item.id}>
-                            <td>{item.name}</td>
-                            <td>{item.description}</td>
-                            <td>${item.price}</td>
-                            <td>{item.is_available ? "Yes" : "No"}</td>
-                            <td>{item.quantity}</td>
-                            <td>${Number(item.quantity) * Number(item.price)}</td>
-                          </tr>
-                        ))}
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td  ><b>Total:</b></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td  >${cartContext?.getCartTotal()}</td>
-                        </tr>
-                  </tbody>
-                </table>
+         </div>
+
+         
         <button onClick={()=>navigate('/profile', { replace: true })
 }>Close</button>
         <button onClick={checkout}>Place Order</button>

@@ -168,17 +168,37 @@ ul{
   align-self: flex-start; /* or stretch, center, etc. */
 }
 
-.quantity-div{
+.button{
+  background: none;
+  color: #000;
+  border: 1px solid #000;
+
+}
+
+.quantity-display{
+  padding:5px;
+}
+
+.button-div{
+  display:flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.checkout-item-card {
   border: 1px solid #ccc;
   padding: 1rem;
   background: #D3D3D3;
   color: #000;
   border-radius: 5px; 
-}
 
-.button{
-  background: none;
-  color: #000;
-  border: 1px solid #000;
+}
+.checkout-item-header {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+.checkout-item-details {
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
 
 }

@@ -68,21 +68,24 @@ const CartView: React.FC<CartViewProps> = ({onClose}) => {
             {menu_items.map(item => (
               <div key={item.id} className="cart-item-card">
                 <div className="cart-item-header">{item.name}</div>
-                <div className="cart-item-details">Price: {item.price}</div>
-                <div className="cart-item-details">Available: {item.is_available ? 'Yes' : 'No'}</div>
+                <div className="cart-item-details">Price: ${item.price}</div>
                 <div className="cart-item-details">
-                  <div className="quantity-div">
                   <button onClick={() => increaseQuantity(item.id!)}>+</button>
-                  <span>{item.quantity}</span>
+                  <span className="quantity-display">{item.quantity}</span>
                   <button onClick={()  => decreaseQuantity(item.id!)}>-</button>
+                  <div style={{padding:"2px"}}>
                   <button onClick={() => removeItems(item.id!)}>Remove</button>
                   </div>
                 </div>
               </div>
             ))}
+            <div className="cart-item-details" style={{color:"black", background:"light-gray"}}>Subtotal: ${cartContext?.getCartTotal()}</div>
          </div>
+         <br></br>
+         <div className="button-div">
          <button onClick={onClose}>Close</button>
-         <button onClick={checkoutClick}>Checkout</button>
+         <button onClick={checkoutClick} style={{backgroundColor: "#0096FF"}}>Checkout</button>
+         </div>
         </>
     )
 
