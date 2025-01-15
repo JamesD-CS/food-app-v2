@@ -5,51 +5,33 @@ import {Link} from 'react-router';
 import  { Restaurant } from './app_types';
 import { CartContext } from "./cart_context.tsx";
 
-
-interface RestaurantTableProps {
+interface RestaurantCardProps {
   restaurants: Restaurant[];
 }
 
-const RestaurantTable: React.FC<RestaurantTableProps> = ({ restaurants }) => {
- 
+const RestCardGrid: React.FC<RestaurantCardProps> = ({restaurants}) => {
+
   if (!Array.isArray(restaurants)) {
     return <div>No data available</div>;
   }
-  
-  return (
-    <table style={{ borderCollapse: "collapse", width: "100%" }}>
-      <thead>
-        <tr>
-          <th colSpan={5}>
-            Restaurants
-          </th>
-        </tr>
-        <tr>
-          <th >ID</th>
-          <th >Name</th>
-          <th >Description</th>
-          <th >Phone Number</th>
-          <th >Email</th>
-        </tr>
-      </thead>
-      <tbody>
-        {restaurants.map((restaurant) => (
-         
-          <tr key={restaurant.id}>
-            <td >{restaurant.id}</td>
-           
-              <td > <Link to={'/rest_details' }  
-            state={{ id: restaurant.id, name:restaurant.name }}>{restaurant.name}</Link>
-            </td>
-            <td >{restaurant.description}</td>
-            <td >{restaurant.phone_number}</td>
-            <td >{restaurant.email}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  );
-};
+
+  return(
+    <>
+    <div className="restaurant-grid">
+    {restaurants.map((restaurant) => (
+                  <Link to={'/rest_details' }  
+                  state={{ id: restaurant.id, name:restaurant.name }}>
+                  <div className="cart-item-card" key={restaurant.id}>
+                    <div className="cart-item-header">{restaurant.name}</div>
+                    <div className="cart-item-details">{restaurant.description}</div>
+                    <div className="cart-item-details">{restaurant.phone_number}</div>
+                  </div>
+                  </Link>
+                ))}
+    </div>
+    </>
+  )
+}
 
 export const getRestData = async (): Promise<Restaurant[]> => {
   try {
@@ -103,7 +85,7 @@ const Restaurants:React.FC = () => {
 
     return(
       <>
-        <RestaurantTable restaurants={data} />
+        <RestCardGrid restaurants={data} />
       </>
 
     )

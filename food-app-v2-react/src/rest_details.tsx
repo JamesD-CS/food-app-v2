@@ -8,11 +8,6 @@ import { CartViewModal } from './cart_modal.tsx';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
-interface MenuTableProps {
-    categories:Category[];
-    menu_items:Menu_item[];
-}
-
 interface MenuCardProps {
   categories: Category[];
   menu_items:Menu_item[];
@@ -28,13 +23,15 @@ const MenuCardGrid: React.FC<MenuCardProps> = ({categories, menu_items, addtoCar
 
   return(
     <>
+
     {groupedItems.map(({ category, items }) => (
               // Use React fragments to group <tr> elements without introducing extra DOM nodes
               <React.Fragment key={category.id}>
                 {/* Category heading row */}
                 
-                    <div className="cart-item-header">{category.name}</div>
-                 
+                <div className="cart-item-header">{category.name}</div>
+              <div className="menu-item-grid">
+
                 {/* Rows for items within this category */}
                 {items.map((item) => (
                   <div className="cart-item-card" key={item.id}>
@@ -45,9 +42,10 @@ const MenuCardGrid: React.FC<MenuCardProps> = ({categories, menu_items, addtoCar
                     <div className="cart-item-details"><button type="button" onClick={() => addtoCart(item)}>Add</button></div>
                   </div>
                 ))}
+              </div>
+
               </React.Fragment>
             ))}
-     
     </>
   )
 
@@ -69,52 +67,6 @@ const RestDetails: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isCartModalOpen, setIsCartModalOpen] = useState<boolean>(false);
     
-
-    const MenuTable: React.FC<MenuTableProps> = ({ categories, menu_items }) => {
-      // Group menu items by their category
-      const groupedItems = categories.map((category) => {
-        const items = menu_items.filter((item) => item.category?.id === category.id);
-        return { category, items };
-      });
-    
-      return (
-        <table>
-          <thead>
-            <tr>
-              {/* Example header row. Adjust columns as needed */}
-              <th style={{ textAlign: "left" }}>Name</th>
-              <th style={{ textAlign: "left" }}>Description</th>
-              <th style={{ textAlign: "left" }}>Price</th>
-              <th style={{ textAlign: "left" }}>Available</th>
-            </tr>
-          </thead>
-          <tbody>
-            {groupedItems.map(({ category, items }) => (
-              // Use React fragments to group <tr> elements without introducing extra DOM nodes
-              <React.Fragment key={category.id}>
-                {/* Category heading row */}
-                <tr>
-                  <th colSpan={4} style={{ textAlign: "left" }}>
-                    {category.name}
-                  </th>
-                </tr>
-                {/* Rows for items within this category */}
-                {items.map((item) => (
-                  <tr key={item.id}>
-                    <td>{item.name}</td>
-                    <td>{item.description}</td>
-                    <td>{item.price}</td>
-                    <td>{item.is_available ? "Yes" : "No"}</td>
-                    <td><button type="button" onClick={() => addToCart(item)}>Add</button></td>
-                  </tr>
-                ))}
-              </React.Fragment>
-            ))}
-          </tbody>
-        </table>
-      );
-    };
-
     const addToCart =(item:Menu_item) => {
       cartContext?.addToCart(item);
       setIsModalOpen(true);
@@ -204,7 +156,6 @@ const RestDetails: React.FC = () => {
         </h2>
         Cart items: {cartContext?.getItemCount()}
         <br />
-        Is logged in?: {cartContext?.getIsLoggedIn().toString()}
         <br />
         <MenuCardGrid categories={categories} menu_items={menu_items} addtoCart={addToCart}/>
         </>

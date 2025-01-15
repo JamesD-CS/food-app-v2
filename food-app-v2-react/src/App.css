@@ -118,6 +118,22 @@ ul{
   gap: 1rem;
 }
 
+.restaurant-grid {
+  display: inline-grid;
+  grid-template-columns: auto auto auto;
+  padding: 10px;
+  gap: 1rem;
+
+}
+
+.menu-item-grid {
+  display: inline-grid;
+  grid-template-columns: auto auto auto;
+  padding: 10px;
+  gap: 1rem;
+
+}
+
 .cart-item-card {
   border: 1px solid #ccc;
   padding: 1rem;
