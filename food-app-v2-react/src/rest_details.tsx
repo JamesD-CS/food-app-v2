@@ -1,13 +1,10 @@
 import React, {useEffect, useState, useContext} from 'react';
-import { createPortal } from 'react-dom';
 import { useLocation } from 'react-router';
 import cookies from 'js-cookie';
 import { Category, Menu_item } from './app_types';
 import { CartContext } from "./cart_context.tsx";
 import FadeOutModal from './FadeOutModal'; // <-- Import the FadeOutModal component
 import { CartViewModal } from './cart_modal.tsx';
-
-
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -16,7 +13,45 @@ interface MenuTableProps {
     menu_items:Menu_item[];
 }
 
+interface MenuCardProps {
+  categories: Category[];
+  menu_items:Menu_item[];
+  addtoCart: (item:Menu_item)=>void;
+}
 
+const MenuCardGrid: React.FC<MenuCardProps> = ({categories, menu_items, addtoCart}) =>{
+
+  const groupedItems = categories.map((category) => {
+    const items = menu_items.filter((item) => item.category?.id === category.id);
+    return { category, items };
+  });
+
+  return(
+    <>
+    {groupedItems.map(({ category, items }) => (
+              // Use React fragments to group <tr> elements without introducing extra DOM nodes
+              <React.Fragment key={category.id}>
+                {/* Category heading row */}
+                
+                    <div className="cart-item-header">{category.name}</div>
+                 
+                {/* Rows for items within this category */}
+                {items.map((item) => (
+                  <div className="cart-item-card" key={item.id}>
+                    <div className="cart-item-header">{item.name}</div>
+                    <div className="cart-item-details">{item.description}</div>
+                    <div className="cart-item-details">{item.price}</div>
+                    <div className="cart-item-details">{item.is_available ? "Yes" : "No"}</div>
+                    <div className="cart-item-details"><button type="button" onClick={() => addtoCart(item)}>Add</button></div>
+                  </div>
+                ))}
+              </React.Fragment>
+            ))}
+     
+    </>
+  )
+
+}
 
 const RestDetails: React.FC = () => {
     let restaurant_info = useLocation();
@@ -171,8 +206,7 @@ const RestDetails: React.FC = () => {
         <br />
         Is logged in?: {cartContext?.getIsLoggedIn().toString()}
         <br />
-
-        <MenuTable categories ={categories} menu_items={menu_items}/>
+        <MenuCardGrid categories={categories} menu_items={menu_items} addtoCart={addToCart}/>
         </>
 
     )
