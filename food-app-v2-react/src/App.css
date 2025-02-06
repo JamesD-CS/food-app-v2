@@ -191,6 +191,10 @@ ul{
 
 }
 
+.button:hover{
+  background-color: #008CBA;
+}
+
 .quantity-display{
   padding:5px;
 }

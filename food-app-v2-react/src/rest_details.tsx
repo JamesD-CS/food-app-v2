@@ -39,7 +39,7 @@ const MenuCardGrid: React.FC<MenuCardProps> = ({categories, menu_items, addtoCar
                     <div className="cart-item-details">{item.description}</div>
                     <div className="cart-item-details">{item.price}</div>
                     <div className="cart-item-details">{item.is_available ? "Yes" : "No"}</div>
-                    <div className="cart-item-details"><button type="button" onClick={() => addtoCart(item)}>Add</button></div>
+                    <div className="cart-item-details"><button type="button" className = "button" onClick={() => addtoCart(item)}>Add</button></div>
                   </div>
                 ))}
               </div>
